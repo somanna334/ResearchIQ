@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/
+
+# Editor / OS
+.vscode/
+Thumbs.db
+
+# Local data (uploads, caches)
+data/
+*.log
