@@ -34,6 +34,10 @@ class Document(Base):
         cascade="all, delete-orphan",
         order_by="Page.page_number",
     )
+    chunks: Mapped[list["Chunk"]] = relationship(
+        back_populates="document",
+        cascade="all, delete-orphan",
+    )
 
 
 class Page(Base):
@@ -49,3 +53,23 @@ class Page(Base):
     char_count: Mapped[int] = mapped_column(Integer)
 
     document: Mapped[Document] = relationship(back_populates="pages")
+
+
+class Chunk(Base):
+    """A piece of one page's text. Several chunk sets (configs) can coexist per document."""
+
+    __tablename__ = "chunks"
+    __table_args__ = (UniqueConstraint("document_id", "chunk_config", "chunk_index"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    document_id: Mapped[str] = mapped_column(
+        ForeignKey("documents.id", ondelete="CASCADE"), index=True
+    )
+    # e.g. "fixed-800-150" = strategy-size-overlap
+    chunk_config: Mapped[str] = mapped_column(String(64), index=True)
+    chunk_index: Mapped[int] = mapped_column(Integer)  # order within the document
+    page_number: Mapped[int] = mapped_column(Integer)
+    text: Mapped[str] = mapped_column(Text)
+    char_count: Mapped[int] = mapped_column(Integer)
+
+    document: Mapped[Document] = relationship(back_populates="chunks")

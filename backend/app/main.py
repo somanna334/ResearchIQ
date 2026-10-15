@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.api import documents
+from app.api import chunks, documents, search
 from app.config import get_settings
 from app.database import init_db
 
@@ -43,6 +43,8 @@ def create_app() -> FastAPI:
         return HealthResponse(status="ok")
 
     app.include_router(documents.router)
+    app.include_router(chunks.router)
+    app.include_router(search.router)
 
     logger.info("App created (environment=%s)", settings.environment)
     return app

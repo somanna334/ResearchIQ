@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -19,6 +20,10 @@ class Settings(BaseSettings):
     # Upload / ingestion limits
     max_upload_mb: int = 25
     max_pages: int = 500
+        # Default chunking (can be overridden per request for experiments)
+    chunk_strategy: Literal["fixed", "sentence"] = "fixed"
+    chunk_size: int = 800
+    chunk_overlap: int = 150
 
     model_config = SettingsConfigDict(
         env_file=".env",

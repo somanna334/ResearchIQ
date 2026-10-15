@@ -3,6 +3,7 @@ import logging
 import uuid
 from pathlib import Path
 from typing import Annotated
+from app.chunking.service import build_chunks, default_chunk_config
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import select
@@ -113,6 +114,8 @@ def upload_document(
     else:
         document.status = "ready"
     db.commit()
+    if document.status == "ready":
+        build_chunks(db, document, default_chunk_config(settings))
     db.refresh(document)
     logger.info(
         "document_ingested id=%s status=%s pages=%d pages_with_text=%d",
