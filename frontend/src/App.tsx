@@ -1,49 +1,55 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { listDocuments } from "./api";
+import type { DocumentInfo } from "./api";
+import Chat from "./components/Chat";
+import DocumentPanel from "./components/DocumentPanel";
 import "./App.css";
 
-const API_URL: string = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+export default function App() {
+  const [documents, setDocuments] = useState<DocumentInfo[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-type Health = { status: string };
-
-type State =
-  | { kind: "loading" }
-  | { kind: "ok"; data: Health }
-  | { kind: "error"; message: string };
-
-function App() {
-  const [state, setState] = useState<State>({ kind: "loading" });
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(`${API_URL}/health`, { signal: controller.signal })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json() as Promise<Health>;
-      })
-      .then((data) => setState({ kind: "ok", data }))
-      .catch((err: Error) => {
-        if (err.name !== "AbortError") {
-          setState({ kind: "error", message: err.message });
-        }
-      });
-
-    return () => controller.abort();
+  const refresh = useCallback(async () => {
+    try {
+      const docs = await listDocuments();
+      setDocuments(docs);
+      // Drop selections for documents that no longer exist.
+      setSelected((prev) => prev.filter((id) => docs.some((d) => d.id === id)));
+      setLoadError(null);
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : "Unknown error");
+    }
   }, []);
 
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  function toggle(id: string) {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+
+  const readyCount = documents.filter((d) => d.status === "ready").length;
+
   return (
-    <main className="app">
-      <h1>ResearchIQ</h1>
-      <p>
-        Backend status:{" "}
-        {state.kind === "loading" && <span>checking…</span>}
-        {state.kind === "ok" && <strong className="ok">{state.data.status}</strong>}
-        {state.kind === "error" && (
-          <strong className="bad">unreachable ({state.message})</strong>
+    <div className="app">
+      <aside className="sidebar">
+        <h1>ResearchIQ</h1>
+        <p className="muted small">Answers grounded in your documents</p>
+        {loadError && (
+          <div className="banner bad small">
+            {loadError}{" "}
+            <button className="link-btn" onClick={() => void refresh()}>
+              Retry
+            </button>
+          </div>
         )}
-      </p>
-    </main>
+        <DocumentPanel documents={documents} selected={selected} onToggle={toggle} onChanged={refresh} />
+      </aside>
+      <main className="main">
+        <Chat selectedIds={selected} readyCount={readyCount} />
+      </main>
+    </div>
   );
 }
-
-export default App;
