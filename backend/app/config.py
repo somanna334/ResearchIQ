@@ -2,6 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,6 +33,12 @@ class Settings(BaseSettings):
     embedding_query_prefix: str = (
         "Represent this sentence for searching relevant passages: "
     )
+
+    # LLM (SecretStr keeps the key out of logs and repr output)
+    llm_provider: Literal["gemini"] = "gemini"
+    gemini_api_key: SecretStr | None = None
+    llm_model: str = "gemini-3.5-flash-lite"
+    llm_max_output_tokens: int = 1024
 
     model_config = SettingsConfigDict(
         env_file=".env",
