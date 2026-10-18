@@ -1,0 +1,20 @@
+﻿services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: researchiq-db
+    environment:
+      POSTGRES_USER: researchiq
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-researchiq_dev}
+      POSTGRES_DB: researchiq
+    ports:
+      - "127.0.0.1:5432:5432"   # reachable from this machine only
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U researchiq -d researchiq"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

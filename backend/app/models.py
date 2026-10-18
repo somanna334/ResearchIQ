@@ -1,18 +1,15 @@
 import uuid
 from datetime import datetime, timezone
+from typing import Any
 
-from sqlalchemy import (
-    DateTime,
-    ForeignKey,
-    Integer,
-    LargeBinary,
-    String,
-    Text,
-    UniqueConstraint,
-)
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.db_types import VectorType
+
+# Fixed by the model (BAAI/bge-small-en-v1.5) and by the pgvector column width.
+EMBEDDING_DIM = 384
 
 
 def _utcnow() -> datetime:
@@ -88,7 +85,7 @@ class Chunk(Base):
 
 
 class Embedding(Base):
-    """One vector per (chunk, model). Stored as raw float32 bytes."""
+    """One vector per (chunk, model)."""
 
     __tablename__ = "embeddings"
     __table_args__ = (UniqueConstraint("chunk_id", "model_name"),)
@@ -99,6 +96,6 @@ class Embedding(Base):
     )
     model_name: Mapped[str] = mapped_column(String(128), index=True)
     dimension: Mapped[int] = mapped_column(Integer)
-    vector: Mapped[bytes] = mapped_column(LargeBinary)
+    vector: Mapped[Any] = mapped_column(VectorType(EMBEDDING_DIM))
 
     chunk: Mapped[Chunk] = relationship(back_populates="embeddings")

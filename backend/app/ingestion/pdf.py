@@ -1,7 +1,11 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-
+from pathlib import Path
+import logging
+import unicodedata
+from dataclasses import dataclass
+from pathlib import Path
 from pypdf import PdfReader
 
 logger = logging.getLogger(__name__)
@@ -39,8 +43,10 @@ class ExtractionResult:
 
 
 def _normalize(text: str) -> str:
-    # NUL characters are legal in some PDFs but cannot be stored in PostgreSQL text.
-    return text.replace("\x00", "").strip()
+       # NFKC turns ligatures such as "ﬁ" into "fi" so keyword search can match them.
+       text = unicodedata.normalize("NFKC", text)
+       # NUL characters are legal in some PDFs but cannot be stored in PostgreSQL text.
+       return text.replace("\x00", "").strip()
 
 
 def extract_pdf(path: Path, max_pages: int) -> ExtractionResult:

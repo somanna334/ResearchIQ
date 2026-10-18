@@ -1,5 +1,5 @@
 import time
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -66,10 +66,16 @@ def search_semantic(
     k: Annotated[int, Query(ge=1, le=20)] = 5,
     document_id: Annotated[list[str] | None, Query()] = None,
     chunk_config: Annotated[str | None, Query(max_length=64)] = None,
+    method: Annotated[
+        Literal["sql", "python"] | None,
+        Query(description="Force pgvector ('sql') or NumPy ('python'). Default: auto."),
+    ] = None,
 ) -> list[SearchHitOut]:
     """Semantic search. `score` is cosine similarity. It never returns 'no match'."""
     key = chunk_config or default_chunk_config(settings).key
-    hits = semantic_search(db, embedder, q, k, key, document_id)
+    if method == "sql" and db.get_bind().dialect.name != "postgresql":
+        raise HTTPException(status_code=400, detail="method=sql needs PostgreSQL")
+    hits = semantic_search(db, embedder, q, k, key, document_id, method)
     return [
         SearchHitOut(
             chunk_id=h.chunk.id,

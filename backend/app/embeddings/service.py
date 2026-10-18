@@ -47,7 +47,7 @@ def embed_chunk_set(
                 chunk_id=chunk.id,
                 model_name=embedder.model_name,
                 dimension=embedder.dimension,
-                vector=np.asarray(vector, dtype=np.float32).tobytes(),
+                vector=np.asarray(vector, dtype=np.float32),
             )
             for chunk, vector in zip(batch, vectors)
         )
