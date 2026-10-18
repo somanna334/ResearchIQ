@@ -39,3 +39,8 @@ def test_too_many_pages_raises(make_pdf):
 
     with pytest.raises(PdfExtractionError):
         extract_pdf(path, max_pages=5)
+from app.ingestion.pdf import _normalize
+
+
+def test_ligatures_are_expanded():
+    assert _normalize("certiﬁcate ﬁrst deﬁning Artiﬁcial") == "certificate first defining Artificial"
