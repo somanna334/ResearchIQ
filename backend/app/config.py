@@ -20,10 +20,18 @@ class Settings(BaseSettings):
     # Upload / ingestion limits
     max_upload_mb: int = 25
     max_pages: int = 500
-        # Default chunking (can be overridden per request for experiments)
+
+    # Default chunking (can be overridden per request for experiments)
     chunk_strategy: Literal["fixed", "sentence"] = "fixed"
     chunk_size: int = 800
     chunk_overlap: int = 150
+
+    # Embeddings
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+    embedding_batch_size: int = 32
+    embedding_query_prefix: str = (
+        "Represent this sentence for searching relevant passages: "
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",

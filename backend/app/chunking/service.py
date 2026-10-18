@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.chunking.strategies import ChunkConfig, chunk_pages
 from app.config import Settings
-from app.models import Chunk, Document
+from app.models import Chunk, Document, Embedding
 
 
 @dataclass(frozen=True)
@@ -31,6 +31,11 @@ def build_chunks(db: Session, document: Document, config: ChunkConfig) -> ChunkS
         [(page.page_number, page.text) for page in document.pages], config
     )
 
+    # Bulk deletes skip ORM cascades, so remove the old vectors explicitly.
+    old_chunk_ids = select(Chunk.id).where(
+        Chunk.document_id == document.id, Chunk.chunk_config == config.key
+    )
+    db.execute(delete(Embedding).where(Embedding.chunk_id.in_(old_chunk_ids)))
     db.execute(
         delete(Chunk).where(
             Chunk.document_id == document.id, Chunk.chunk_config == config.key

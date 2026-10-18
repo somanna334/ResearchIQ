@@ -1,7 +1,15 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -73,3 +81,24 @@ class Chunk(Base):
     char_count: Mapped[int] = mapped_column(Integer)
 
     document: Mapped[Document] = relationship(back_populates="chunks")
+    embeddings: Mapped[list["Embedding"]] = relationship(
+        back_populates="chunk",
+        cascade="all, delete-orphan",
+    )
+
+
+class Embedding(Base):
+    """One vector per (chunk, model). Stored as raw float32 bytes."""
+
+    __tablename__ = "embeddings"
+    __table_args__ = (UniqueConstraint("chunk_id", "model_name"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    chunk_id: Mapped[int] = mapped_column(
+        ForeignKey("chunks.id", ondelete="CASCADE"), index=True
+    )
+    model_name: Mapped[str] = mapped_column(String(128), index=True)
+    dimension: Mapped[int] = mapped_column(Integer)
+    vector: Mapped[bytes] = mapped_column(LargeBinary)
+
+    chunk: Mapped[Chunk] = relationship(back_populates="embeddings")
