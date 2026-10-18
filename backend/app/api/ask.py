@@ -11,8 +11,11 @@ from app.embeddings.embedder import Embedder, get_embedder
 from app.generation.service import answer_question
 from app.llm.base import LLMError, LLMProvider
 from app.llm.factory import get_llm_provider
+from app.retrieval.rerank import Reranker, get_reranker
 
 router = APIRouter(tags=["ask"])
+
+ModeName = Literal["semantic", "hybrid", "hybrid_rerank"]
 
 
 class AskRequest(BaseModel):
@@ -20,6 +23,7 @@ class AskRequest(BaseModel):
     k: int = Field(5, ge=1, le=10)
     document_ids: list[str] | None = None
     chunk_config: str | None = Field(None, max_length=64)
+    mode: ModeName | None = Field(None, description="Defaults to the server setting")
 
 
 class SourceOut(BaseModel):
@@ -28,7 +32,7 @@ class SourceOut(BaseModel):
     document_id: str
     filename: str
     page_number: int
-    score: float
+    score: float  # meaning depends on the retrieval mode
     text: str
     cited: bool
 
@@ -41,11 +45,19 @@ class UsageOut(BaseModel):
     llm_ms: float
 
 
+class RetrievalOut(BaseModel):
+    mode: ModeName
+    best_dense_score: float | None
+    min_top_score: float
+    gated: bool
+
+
 class AskResponse(BaseModel):
     status: Literal["answered", "insufficient_evidence", "citation_error"]
     answer: str
     sources: list[SourceOut]
     usage: UsageOut
+    retrieval: RetrievalOut
 
 
 @router.post("/ask", response_model=AskResponse)
@@ -54,13 +66,16 @@ def ask(
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     embedder: Annotated[Embedder, Depends(get_embedder)],
+    reranker: Annotated[Reranker, Depends(get_reranker)],
     llm: Annotated[LLMProvider, Depends(get_llm_provider)],
 ) -> AskResponse:
-    """Answer from the documents, with validated citations. Semantic retrieval only for now."""
+    """Answer from the documents, with validated citations."""
     key = body.chunk_config or default_chunk_config(settings).key
+    mode = body.mode or settings.retrieval_mode
     try:
         result = answer_question(
-            db, embedder, llm, body.question, body.k, key, body.document_ids
+            db, settings, embedder, reranker, llm, body.question, body.k, key,
+            body.document_ids, mode,
         )
     except LLMError as exc:
         raise HTTPException(
@@ -89,5 +104,13 @@ def ask(
             completion_tokens=result.completion_tokens,
             retrieval_ms=round(result.retrieval_ms, 1),
             llm_ms=round(result.llm_ms, 1),
+        ),
+        retrieval=RetrievalOut(
+            mode=result.mode,
+            best_dense_score=(
+                round(result.best_dense, 4) if result.best_dense is not None else None
+            ),
+            min_top_score=settings.min_top_score,
+            gated=result.gated,
         ),
     )

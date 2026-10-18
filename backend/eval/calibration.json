@@ -1,0 +1,16 @@
+[
+  {"q": "Can I skip the graduation ceremony and still get my certificate?", "answerable": true, "expected_pages": [14]},
+  {"q": "What are the steps to enrol in the programme?", "answerable": true, "expected_pages": [18]},
+  {"q": "Which topics does the curriculum cover?", "answerable": true, "expected_pages": [11]},
+  {"q": "Who teaches the programme and what are their research areas?", "answerable": true, "expected_pages": [10]},
+  {"q": "Who receives a certificate with Distinction?", "answerable": true, "expected_pages": [9]},
+  {"q": "What benefits do alumni get?", "answerable": true, "expected_pages": [15, 6]},
+  {"q": "What projects will I build during the programme?", "answerable": true, "expected_pages": [12, 13, 6]},
+  {"q": "How many hours of live instruction are included?", "answerable": true, "expected_pages": [6, 11]},
+  {"q": "How long is the programme?", "answerable": true, "expected_pages": [6, 11]},
+  {"q": "What is the refund policy for cancelled flights?", "answerable": false},
+  {"q": "Who won the 2018 football World Cup?", "answerable": false},
+  {"q": "How do I bake sourdough bread?", "answerable": false},
+  {"q": "What is the capital of Australia?", "answerable": false},
+  {"q": "sdsddsdf", "answerable": false}
+]

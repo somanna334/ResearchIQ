@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.api import ask, chunks, documents, embeddings, search
+from app.api import ask, chunks, documents, embeddings, hybrid, search
 from app.config import get_settings
 from app.database import init_db
 
@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 def create_app() -> FastAPI:
     settings = get_settings()
-    app = FastAPI(title=settings.app_name, version="0.5.0", lifespan=lifespan)
+    app = FastAPI(title=settings.app_name, version="0.6.0", lifespan=lifespan)
 
     app.add_middleware(
         CORSMiddleware,
@@ -46,6 +46,7 @@ def create_app() -> FastAPI:
     app.include_router(chunks.router)
     app.include_router(search.router)
     app.include_router(embeddings.router)
+    app.include_router(hybrid.router)
     app.include_router(ask.router)
 
     logger.info("App created (environment=%s)", settings.environment)
