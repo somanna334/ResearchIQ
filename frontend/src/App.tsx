@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 import { listDocuments } from "./api";
 import type { DocumentInfo } from "./api";
+import AnalysisView from "./components/AnalysisView";
 import Chat from "./components/Chat";
 import DocumentPanel from "./components/DocumentPanel";
 import "./App.css";
+import "./Analysis.css";
+
+type View = "chat" | "analyze";
 
 export default function App() {
   const [documents, setDocuments] = useState<DocumentInfo[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [view, setView] = useState<View>("chat");
 
   const refresh = useCallback(async () => {
     try {
@@ -48,7 +53,24 @@ export default function App() {
         <DocumentPanel documents={documents} selected={selected} onToggle={toggle} onChanged={refresh} />
       </aside>
       <main className="main">
-        <Chat selectedIds={selected} readyCount={readyCount} />
+        <nav className="tabs">
+          <button className={"tab" + (view === "chat" ? " active" : "")} onClick={() => setView("chat")}>
+            Chat
+          </button>
+          <button
+            className={"tab" + (view === "analyze" ? " active" : "")}
+            onClick={() => setView("analyze")}
+          >
+            Summarize &amp; compare
+          </button>
+        </nav>
+        {/* Both stay mounted so switching tabs doesn't lose the conversation. */}
+        <div className="view" hidden={view !== "chat"}>
+          <Chat selectedIds={selected} readyCount={readyCount} />
+        </div>
+        <div className="view" hidden={view !== "analyze"}>
+          <AnalysisView documents={documents} />
+        </div>
       </main>
     </div>
   );
