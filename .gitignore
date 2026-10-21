@@ -21,3 +21,6 @@ Thumbs.db
 # Local data (uploads, caches)
 data/
 *.log
+backend/eval/results/*-answers.json
+backend/eval/results/*.partial.jsonl
+backend/eval/results/*-audit.md

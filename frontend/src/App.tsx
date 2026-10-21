@@ -4,10 +4,11 @@ import type { DocumentInfo } from "./api";
 import AnalysisView from "./components/AnalysisView";
 import Chat from "./components/Chat";
 import DocumentPanel from "./components/DocumentPanel";
+import EvalView from "./components/EvalView";
 import "./App.css";
 import "./Analysis.css";
 
-type View = "chat" | "analyze";
+type View = "chat" | "analyze" | "eval";
 
 export default function App() {
   const [documents, setDocuments] = useState<DocumentInfo[]>([]);
@@ -63,13 +64,19 @@ export default function App() {
           >
             Summarize &amp; compare
           </button>
+          <button className={"tab" + (view === "eval" ? " active" : "")} onClick={() => setView("eval")}>
+            Evaluation
+          </button>
         </nav>
-        {/* Both stay mounted so switching tabs doesn't lose the conversation. */}
+        {/* All views stay mounted so switching tabs doesn't lose state. */}
         <div className="view" hidden={view !== "chat"}>
           <Chat selectedIds={selected} readyCount={readyCount} />
         </div>
         <div className="view" hidden={view !== "analyze"}>
           <AnalysisView documents={documents} />
+        </div>
+        <div className="view" hidden={view !== "eval"}>
+          <EvalView active={view === "eval"} />
         </div>
       </main>
     </div>

@@ -1,0 +1,8 @@
+{
+  "currency": "USD",
+  "source": "Fill in from the provider's official pricing page, then set checked_on.",
+  "checked_on": null,
+  "per_million_tokens": {
+    "gemini-3.5-flash-lite": {"input": null, "output": null}
+  }
+}

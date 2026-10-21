@@ -34,20 +34,25 @@ class Settings(BaseSettings):
         "Represent this sentence for searching relevant passages: "
     )
 
-    # Retrieval. "semantic" is the baseline; Milestone 8 decides the default from measurements.
+    # Retrieval. "semantic" is the baseline; evaluation decides the default.
     retrieval_mode: Literal["semantic", "hybrid", "hybrid_rerank"] = "semantic"
-    candidate_pool: int = 20  # candidates fetched from each method before fusion
-    rrf_k: int = 60  # conventional default, not tuned
+    candidate_pool: int = 20
+    rrf_k: int = 60
     reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
-    # PROVISIONAL refusal threshold on the best dense cosine similarity.
-    # Calibrate with `python -m app.retrieval.calibrate`, then set it in .env.
-    min_top_score: float = 0.55
+    # Refusal threshold on the best dense cosine similarity. Choose it from the
+    # evaluation report's threshold table, then set it in .env.
+    min_top_score: float = 0.58
 
     # LLM (SecretStr keeps the key out of logs and repr output)
     llm_provider: Literal["gemini"] = "gemini"
     gemini_api_key: SecretStr | None = None
     llm_model: str = "gemini-3.5-flash-lite"
     llm_max_output_tokens: int = 1024
+
+    # Evaluation
+    eval_results_dir: Path = Path("eval/results")
+    judge_model: str | None = None  # None means: use llm_model
+    eval_requests_per_minute: int = 8  # keep under your provider's limit
 
     model_config = SettingsConfigDict(
         env_file=".env",
