@@ -1,0 +1,4208 @@
+{
+  "schema": 1,
+  "meta": {
+    "run_id": "20261019T165455Z",
+    "created_utc": "2026-10-19T16:54:55+00:00",
+    "git_commit": "d40cfba",
+    "git_dirty": true,
+    "python": "3.11.9",
+    "k": 5,
+    "dataset": {
+      "path": "eval/datasets/v1.jsonl",
+      "sha256": "69987c1f11115a475224022458db8c4a69ecf7ca7cb4a262eb0ab4c0ee36a3f2",
+      "questions": 8
+    },
+    "corpus": [
+      {
+        "filename": "brochure.pdf",
+        "sha256": "03c783b945d0fc3691c09ce5df7413ab75dc78272208bf9398b40b833c2486f2",
+        "pages": 19
+      }
+    ],
+    "settings": {
+      "embedding_model": "BAAI/bge-small-en-v1.5",
+      "reranker_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+      "candidate_pool": 20,
+      "rrf_k": 60,
+      "min_top_score": 0.58
+    }
+  },
+  "experiments": [
+    {
+      "name": "baseline",
+      "config": {
+        "chunk_config": "fixed-800-150",
+        "chunk": {
+          "strategy": "fixed",
+          "chunk_size": 800,
+          "overlap": 150
+        },
+        "mode": "semantic",
+        "embedding_model": "BAAI/bge-small-en-v1.5"
+      },
+      "questions": [
+        {
+          "id": "q001",
+          "question": "Can I skip the graduation ceremony and still get my certificate?",
+          "type": "paraphrase",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6539,
+          "latency_ms": 33.8,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.6539
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.6437
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.6343
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": 0.5417
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 0.5325
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 11,
+              "score": 0.5305
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.4737
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": 0.4672
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.4652
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.4606
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              14
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.2,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q002",
+          "question": "What are the steps to enrol in the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.7389,
+          "latency_ms": 33.4,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 0.7389
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.5849
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.5806
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.5793
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.5693
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.5682
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.5642
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 11,
+              "score": 0.5629
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.5619
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.5547
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              18
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q003",
+          "question": "Who receives a certificate with Distinction?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6885,
+          "latency_ms": 30.5,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.6885
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.6695
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.6251
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.5689
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": 0.5447
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 11,
+              "score": 0.5397
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.5275
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": 0.523
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.5208
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.4978
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              9
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q004",
+          "question": "How long is the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6672,
+          "latency_ms": 32.4,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.6672
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.62
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.6136
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.596
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 24,
+              "score": 0.5842
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.568
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.5639
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 34,
+              "score": 0.5562
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 23,
+              "score": 0.55
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.547
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.6,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.4,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q005",
+          "question": "How many hours of live instruction does the programme include?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6731,
+          "latency_ms": 52.9,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.6731
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.6285
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.5996
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.5965
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.5883
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": 0.5873
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 23,
+              "score": 0.5864
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 24,
+              "score": 0.5853
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.5764
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": 0.5631
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.4,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q101",
+          "question": "What is the refund policy for cancelled flights?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.5556,
+          "latency_ms": 32.3,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.5556
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 0.5054
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 36,
+              "score": 0.466
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.4397
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.4337
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 23,
+              "score": 0.4288
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 22,
+              "score": 0.419
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.406
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": 0.4006
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.3953
+            }
+          ]
+        },
+        {
+          "id": "q102",
+          "question": "Who won the 2018 football World Cup?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4703,
+          "latency_ms": 31.8,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": 0.4703
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.465
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 19,
+              "score": 0.4508
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.4451
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.4448
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 4,
+              "chunk_index": 7,
+              "score": 0.4445
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": 0.4428
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 18,
+              "score": 0.4426
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.4424
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 23,
+              "score": 0.4411
+            }
+          ]
+        },
+        {
+          "id": "q103",
+          "question": "How do I bake sourdough bread?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4516,
+          "latency_ms": 30.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 0.4516
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.449
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": 0.4313
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.425
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.4159
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 36,
+              "score": 0.4061
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 21,
+              "score": 0.4035
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 13,
+              "chunk_index": 27,
+              "score": 0.3965
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.39
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 12,
+              "chunk_index": 25,
+              "score": 0.3856
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hybrid",
+      "config": {
+        "chunk_config": "fixed-800-150",
+        "chunk": {
+          "strategy": "fixed",
+          "chunk_size": 800,
+          "overlap": 150
+        },
+        "mode": "hybrid",
+        "embedding_model": "BAAI/bge-small-en-v1.5"
+      },
+      "questions": [
+        {
+          "id": "q001",
+          "question": "Can I skip the graduation ceremony and still get my certificate?",
+          "type": "paraphrase",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6539,
+          "latency_ms": 41.1,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.0328
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.031
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 11,
+              "score": 0.031
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 0.031
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.0308
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.0295
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.0286
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 1,
+              "chunk_index": 0,
+              "score": 0.0272
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": 0.0161
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": 0.0156
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              14
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.2,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q002",
+          "question": "What are the steps to enrol in the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.7389,
+          "latency_ms": 48.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 0.0328
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.0311
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.0304
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 11,
+              "score": 0.0299
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": 0.0295
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.029
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": 0.0286
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": 0.0282
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.0159
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.0156
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              18
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q003",
+          "question": "Who receives a certificate with Distinction?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6885,
+          "latency_ms": 49.3,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.0328
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.032
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.0318
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.0306
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": 0.0305
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.0304
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 1,
+              "chunk_index": 0,
+              "score": 0.028
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 11,
+              "score": 0.0152
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.0149
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": 0.0147
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              9
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q004",
+          "question": "How long is the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6672,
+          "latency_ms": 47.7,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.0312
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.0311
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.031
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.0296
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": 0.0294
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 12,
+              "score": 0.0293
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": 0.0292
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": 0.028
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.0164
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 24,
+              "score": 0.0154
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.0,
+            "precision@1": 0.0,
+            "ndcg@1": 0.0,
+            "recall@3": 0.5,
+            "precision@3": 0.333333,
+            "ndcg@3": 0.386853,
+            "recall@5": 0.5,
+            "precision@5": 0.2,
+            "ndcg@5": 0.386853,
+            "recall@10": 1.0,
+            "precision@10": 0.3,
+            "ndcg@10": 0.580279,
+            "mrr": 0.5
+          }
+        },
+        {
+          "id": "q005",
+          "question": "How many hours of live instruction does the programme include?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6731,
+          "latency_ms": 53.8,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.0325
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.0323
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": 0.0313
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.0301
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.03
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.0299
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 12,
+              "score": 0.0297
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": 0.0294
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.0281
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": 0.0276
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.2,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q101",
+          "question": "What is the refund policy for cancelled flights?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.5556,
+          "latency_ms": 57.5,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 22,
+              "score": 0.0313
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": 0.0299
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.0294
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.0293
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 12,
+              "chunk_index": 26,
+              "score": 0.0284
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.0164
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 0.0161
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": 0.0161
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 36,
+              "score": 0.0159
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.0156
+            }
+          ]
+        },
+        {
+          "id": "q102",
+          "question": "Who won the 2018 football World Cup?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4703,
+          "latency_ms": 61.7,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": 0.0325
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 4,
+              "chunk_index": 7,
+              "score": 0.0308
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.0305
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.0274
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": 0.0272
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.0164
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.0161
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 19,
+              "score": 0.0159
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.0159
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": 0.0156
+            }
+          ]
+        },
+        {
+          "id": "q103",
+          "question": "How do I bake sourdough bread?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4516,
+          "latency_ms": 51.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": 0.0323
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.0318
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": 0.0296
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.0287
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 0.0164
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 12,
+              "score": 0.0159
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.0156
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.0154
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 36,
+              "score": 0.0152
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 21,
+              "score": 0.0149
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hybrid-rerank",
+      "config": {
+        "chunk_config": "fixed-800-150",
+        "chunk": {
+          "strategy": "fixed",
+          "chunk_size": 800,
+          "overlap": 150
+        },
+        "mode": "hybrid_rerank",
+        "embedding_model": "BAAI/bge-small-en-v1.5"
+      },
+      "questions": [
+        {
+          "id": "q001",
+          "question": "Can I skip the graduation ceremony and still get my certificate?",
+          "type": "paraphrase",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6539,
+          "latency_ms": 960.9,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": -1.6508
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": -8.6007
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 11,
+              "score": -9.1587
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": -9.2439
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": -10.8966
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": -10.9213
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": -10.9569
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": -11.1043
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": -11.1224
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 1,
+              "chunk_index": 0,
+              "score": -11.1277
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              14
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.2,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q002",
+          "question": "What are the steps to enrol in the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.7389,
+          "latency_ms": 781.5,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 35,
+              "score": 5.9688
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": -9.3011
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": -9.6107
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 12,
+              "score": -9.6805
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": -9.9331
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": -10.0131
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 11,
+              "score": -10.0197
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": -10.2238
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": -10.2403
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": -10.5434
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              18
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q003",
+          "question": "Who receives a certificate with Distinction?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6885,
+          "latency_ms": 680.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 5.087
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": -7.9766
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": -8.1803
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": -10.2494
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": -10.9446
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": -11.0163
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 1,
+              "chunk_index": 0,
+              "score": -11.0284
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": -11.1025
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 1,
+              "score": -11.1817
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": -11.2045
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              9
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q004",
+          "question": "How long is the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6672,
+          "latency_ms": 758.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": -3.15
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 24,
+              "score": -3.7023
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 34,
+              "score": -4.5745
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": -5.1041
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": -7.521
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": -8.4254
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": -8.9182
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 23,
+              "score": -9.0686
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": -9.1108
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 16,
+              "score": -9.2041
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 0.5,
+            "precision@3": 0.666667,
+            "ndcg@3": 0.613147,
+            "recall@5": 1.0,
+            "precision@5": 0.6,
+            "ndcg@5": 0.919721,
+            "recall@10": 1.0,
+            "precision@10": 0.4,
+            "ndcg@10": 0.919721,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q005",
+          "question": "How many hours of live instruction does the programme include?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6731,
+          "latency_ms": 797.0,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 1.4263
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.7903
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 9,
+              "score": -10.4742
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": -11.0551
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": -11.0797
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": -11.0903
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 12,
+              "score": -11.0957
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 24,
+              "score": -11.1092
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": -11.1519
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": -11.1595
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.3,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q101",
+          "question": "What is the refund policy for cancelled flights?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.5556,
+          "latency_ms": 696.1,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": -11.1003
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 29,
+              "score": -11.1119
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": -11.1281
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": -11.1302
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": -11.1398
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": -11.1458
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": -11.157
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 31,
+              "score": -11.1626
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 36,
+              "score": -11.1705
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 12,
+              "chunk_index": 25,
+              "score": -11.1892
+            }
+          ]
+        },
+        {
+          "id": "q102",
+          "question": "Who won the 2018 football World Cup?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4703,
+          "latency_ms": 982.2,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": -10.8951
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 1,
+              "score": -10.9052
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": -10.9117
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": -10.9503
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": -10.9517
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": -10.9554
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 12,
+              "score": -10.9596
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 30,
+              "score": -10.9651
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 13,
+              "chunk_index": 27,
+              "score": -10.9675
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 12,
+              "chunk_index": 25,
+              "score": -10.9724
+            }
+          ]
+        },
+        {
+          "id": "q103",
+          "question": "How do I bake sourdough bread?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4516,
+          "latency_ms": 752.1,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": -11.0678
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": -11.0798
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": -11.0805
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": -11.096
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 13,
+              "chunk_index": 27,
+              "score": -11.1158
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 12,
+              "score": -11.1159
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": -11.1173
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 12,
+              "chunk_index": 25,
+              "score": -11.12
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": -11.1201
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 24,
+              "score": -11.1441
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chunks-400",
+      "config": {
+        "chunk_config": "fixed-400-80",
+        "chunk": {
+          "strategy": "fixed",
+          "chunk_size": 400,
+          "overlap": 80
+        },
+        "mode": "semantic",
+        "embedding_model": "BAAI/bge-small-en-v1.5"
+      },
+      "questions": [
+        {
+          "id": "q001",
+          "question": "Can I skip the graduation ceremony and still get my certificate?",
+          "type": "paraphrase",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6945,
+          "latency_ms": 33.3,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 51,
+              "score": 0.6945
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 52,
+              "score": 0.6738
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 29,
+              "score": 0.6422
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 30,
+              "score": 0.5821
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 54,
+              "score": 0.563
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 50,
+              "score": 0.5404
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 62,
+              "score": 0.5325
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 6,
+              "score": 0.5314
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 19,
+              "score": 0.5054
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 53,
+              "score": 0.4925
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              14
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.3,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q002",
+          "question": "What are the steps to enrol in the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.7389,
+          "latency_ms": 34.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 62,
+              "score": 0.7389
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 25,
+              "score": 0.6137
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 59,
+              "score": 0.5822
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 17,
+              "score": 0.5782
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 54,
+              "score": 0.5753
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 35,
+              "score": 0.5719
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 52,
+              "score": 0.5623
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 29,
+              "score": 0.558
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 8,
+              "score": 0.5577
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 51,
+              "score": 0.5574
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              18
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q003",
+          "question": "Who receives a certificate with Distinction?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.7256,
+          "latency_ms": 34.3,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 52,
+              "score": 0.7256
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 29,
+              "score": 0.7082
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 51,
+              "score": 0.6919
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 30,
+              "score": 0.6254
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 54,
+              "score": 0.5895
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 59,
+              "score": 0.5867
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 56,
+              "score": 0.5675
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 9,
+              "score": 0.5593
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 50,
+              "score": 0.5474
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 8,
+              "score": 0.5356
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              9
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.0,
+            "precision@1": 0.0,
+            "ndcg@1": 0.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 0.63093,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 0.63093,
+            "recall@10": 1.0,
+            "precision@10": 0.2,
+            "ndcg@10": 0.63093,
+            "mrr": 0.5
+          }
+        },
+        {
+          "id": "q004",
+          "question": "How long is the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6807,
+          "latency_ms": 27.9,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 35,
+              "score": 0.6807
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 17,
+              "score": 0.6191
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 25,
+              "score": 0.6132
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 43,
+              "score": 0.5989
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 56,
+              "score": 0.5936
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 57,
+              "score": 0.588
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 8,
+              "score": 0.5761
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 26,
+              "score": 0.5622
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 13,
+              "chunk_index": 48,
+              "score": 0.557
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 18,
+              "score": 0.552
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.6,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.4,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q005",
+          "question": "How many hours of live instruction does the programme include?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6902,
+          "latency_ms": 29.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 35,
+              "score": 0.6902
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 17,
+              "score": 0.6311
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 57,
+              "score": 0.6249
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 25,
+              "score": 0.6032
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 7,
+              "score": 0.6015
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 8,
+              "score": 0.5968
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 43,
+              "score": 0.5932
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 16,
+              "score": 0.5886
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 13,
+              "chunk_index": 48,
+              "score": 0.5842
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 18,
+              "score": 0.5839
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.4,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q101",
+          "question": "What is the refund policy for cancelled flights?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.5296,
+          "latency_ms": 27.9,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 52,
+              "score": 0.5296
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 62,
+              "score": 0.5054
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 63,
+              "score": 0.466
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 51,
+              "score": 0.4474
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 42,
+              "score": 0.4408
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 23,
+              "score": 0.4392
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 41,
+              "score": 0.4379
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 29,
+              "score": 0.4291
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 54,
+              "score": 0.4233
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 39,
+              "score": 0.4207
+            }
+          ]
+        },
+        {
+          "id": "q102",
+          "question": "Who won the 2018 football World Cup?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.467,
+          "latency_ms": 27.7,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": 0.467
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 9,
+              "score": 0.4651
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 32,
+              "score": 0.4636
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 23,
+              "score": 0.4621
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 33,
+              "score": 0.4621
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 34,
+              "score": 0.4576
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 50,
+              "score": 0.4561
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 17,
+              "score": 0.4552
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 52,
+              "score": 0.4538
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 4,
+              "chunk_index": 12,
+              "score": 0.4527
+            }
+          ]
+        },
+        {
+          "id": "q103",
+          "question": "How do I bake sourdough bread?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4516,
+          "latency_ms": 32.1,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 62,
+              "score": 0.4516
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 26,
+              "score": 0.4441
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 15,
+              "score": 0.4409
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 25,
+              "score": 0.4404
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 14,
+              "score": 0.4368
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 37,
+              "score": 0.4358
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 52,
+              "score": 0.4069
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 63,
+              "score": 0.4061
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 43,
+              "score": 0.4047
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 38,
+              "score": 0.4044
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chunks-1200",
+      "config": {
+        "chunk_config": "fixed-1200-200",
+        "chunk": {
+          "strategy": "fixed",
+          "chunk_size": 1200,
+          "overlap": 200
+        },
+        "mode": "semantic",
+        "embedding_model": "BAAI/bge-small-en-v1.5"
+      },
+      "questions": [
+        {
+          "id": "q001",
+          "question": "Can I skip the graduation ceremony and still get my certificate?",
+          "type": "paraphrase",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6583,
+          "latency_ms": 30.9,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 18,
+              "score": 0.6583
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 10,
+              "score": 0.6343
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 19,
+              "score": 0.5417
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 22,
+              "score": 0.5325
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 21,
+              "score": 0.4696
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 2,
+              "score": 0.4642
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.4602
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 6,
+              "score": 0.4508
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 23,
+              "score": 0.4455
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 13,
+              "score": 0.4444
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              14
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q002",
+          "question": "What are the steps to enrol in the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.7389,
+          "latency_ms": 33.7,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 22,
+              "score": 0.7389
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 21,
+              "score": 0.5811
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 13,
+              "score": 0.5768
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 8,
+              "score": 0.5737
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 6,
+              "score": 0.5683
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 10,
+              "score": 0.5642
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 20,
+              "score": 0.5474
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 5,
+              "score": 0.5421
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 18,
+              "score": 0.5414
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 23,
+              "score": 0.5408
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              18
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q003",
+          "question": "Who receives a certificate with Distinction?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6885,
+          "latency_ms": 31.2,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 10,
+              "score": 0.6885
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 18,
+              "score": 0.6268
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 21,
+              "score": 0.5688
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 19,
+              "score": 0.523
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.5103
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 2,
+              "score": 0.5073
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 20,
+              "score": 0.5068
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 13,
+              "score": 0.4756
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 15,
+              "score": 0.474
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 6,
+              "score": 0.4625
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              9
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q004",
+          "question": "How long is the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6558,
+          "latency_ms": 30.0,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 13,
+              "score": 0.6558
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 6,
+              "score": 0.6014
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 20,
+              "score": 0.5993
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 8,
+              "score": 0.5875
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 15,
+              "score": 0.5646
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 21,
+              "score": 0.5614
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 9,
+              "score": 0.5499
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 5,
+              "score": 0.5431
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.5425
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 18,
+              "score": 0.5375
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.6,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.3,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q005",
+          "question": "How many hours of live instruction does the programme include?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6662,
+          "latency_ms": 29.4,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 13,
+              "score": 0.6662
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 6,
+              "score": 0.6083
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 20,
+              "score": 0.6016
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 8,
+              "score": 0.5982
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 5,
+              "score": 0.5883
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 15,
+              "score": 0.5868
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 7,
+              "score": 0.5579
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.5539
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 13,
+              "chunk_index": 17,
+              "score": 0.5529
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 9,
+              "score": 0.5529
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.3,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q101",
+          "question": "What is the refund policy for cancelled flights?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.5054,
+          "latency_ms": 30.5,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 22,
+              "score": 0.5054
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 23,
+              "score": 0.466
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 14,
+              "score": 0.4409
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 10,
+              "score": 0.4337
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 8,
+              "score": 0.4211
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 15,
+              "score": 0.4127
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 18,
+              "score": 0.4083
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 19,
+              "score": 0.4006
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 20,
+              "score": 0.3975
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.3914
+            }
+          ]
+        },
+        {
+          "id": "q102",
+          "question": "Who won the 2018 football World Cup?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4733,
+          "latency_ms": 126.5,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 12,
+              "score": 0.4733
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 6,
+              "score": 0.4527
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 11,
+              "score": 0.4473
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.4454
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 18,
+              "score": 0.4449
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 8,
+              "score": 0.4439
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 13,
+              "score": 0.4287
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 1,
+              "score": 0.4276
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 15,
+              "score": 0.4218
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 1,
+              "chunk_index": 0,
+              "score": 0.4132
+            }
+          ]
+        },
+        {
+          "id": "q103",
+          "question": "How do I bake sourdough bread?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4516,
+          "latency_ms": 37.8,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 22,
+              "score": 0.4516
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 8,
+              "score": 0.4372
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 5,
+              "score": 0.4314
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 9,
+              "score": 0.4171
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 13,
+              "score": 0.4138
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 23,
+              "score": 0.4061
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 14,
+              "score": 0.4032
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 13,
+              "chunk_index": 17,
+              "score": 0.3965
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 12,
+              "score": 0.3943
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 12,
+              "chunk_index": 16,
+              "score": 0.3938
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sentence-800",
+      "config": {
+        "chunk_config": "sentence-800-150",
+        "chunk": {
+          "strategy": "sentence",
+          "chunk_size": 800,
+          "overlap": 150
+        },
+        "mode": "semantic",
+        "embedding_model": "BAAI/bge-small-en-v1.5"
+      },
+      "questions": [
+        {
+          "id": "q001",
+          "question": "Can I skip the graduation ceremony and still get my certificate?",
+          "type": "paraphrase",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6624,
+          "latency_ms": 41.7,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.6624
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 27,
+              "score": 0.6386
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.6343
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 29,
+              "score": 0.5417
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 34,
+              "score": 0.5325
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": 0.5091
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.4854
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 30,
+              "score": 0.4758
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 32,
+              "score": 0.4652
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.4589
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              14
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.2,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q002",
+          "question": "What are the steps to enrol in the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.7389,
+          "latency_ms": 33.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 34,
+              "score": 0.7389
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.5923
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.5849
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.5806
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.5796
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 30,
+              "score": 0.576
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 32,
+              "score": 0.5693
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.5642
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.5513
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": 0.5428
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              18
+            ]
+          ],
+          "metrics": {
+            "recall@1": 1.0,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q003",
+          "question": "Who receives a certificate with Distinction?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.7069,
+          "latency_ms": 30.6,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.7069
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.6885
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 27,
+              "score": 0.6118
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 32,
+              "score": 0.5689
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": 0.5687
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 30,
+              "score": 0.538
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 15,
+              "chunk_index": 29,
+              "score": 0.523
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 3,
+              "score": 0.5205
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.5057
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.4902
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              9
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.0,
+            "precision@1": 0.0,
+            "ndcg@1": 0.0,
+            "recall@3": 1.0,
+            "precision@3": 0.333333,
+            "ndcg@3": 0.63093,
+            "recall@5": 1.0,
+            "precision@5": 0.2,
+            "ndcg@5": 0.63093,
+            "recall@10": 1.0,
+            "precision@10": 0.1,
+            "ndcg@10": 0.63093,
+            "mrr": 0.5
+          }
+        },
+        {
+          "id": "q004",
+          "question": "How long is the programme?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6672,
+          "latency_ms": 29.8,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.6672
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 30,
+              "score": 0.6236
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.62
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.6094
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.5626
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 22,
+              "score": 0.5549
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.5535
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 33,
+              "score": 0.5498
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 17,
+              "chunk_index": 32,
+              "score": 0.547
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": 0.545
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 0.919721,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 0.919721,
+            "recall@10": 1.0,
+            "precision@10": 0.3,
+            "ndcg@10": 0.919721,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q005",
+          "question": "How many hours of live instruction does the programme include?",
+          "type": "factoid",
+          "split": "dev",
+          "answerable": true,
+          "best_dense": 0.6731,
+          "latency_ms": 29.3,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.6731
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.6285
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 30,
+              "score": 0.6144
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.6013
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.5939
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 23,
+              "score": 0.5715
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.5712
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 7,
+              "chunk_index": 12,
+              "score": 0.5689
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 22,
+              "score": 0.5666
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": 0.5631
+            }
+          ],
+          "relevant": [
+            [
+              "brochure.pdf",
+              6
+            ],
+            [
+              "brochure.pdf",
+              11
+            ]
+          ],
+          "metrics": {
+            "recall@1": 0.5,
+            "precision@1": 1.0,
+            "ndcg@1": 1.0,
+            "recall@3": 1.0,
+            "precision@3": 0.666667,
+            "ndcg@3": 1.0,
+            "recall@5": 1.0,
+            "precision@5": 0.4,
+            "ndcg@5": 1.0,
+            "recall@10": 1.0,
+            "precision@10": 0.4,
+            "ndcg@10": 1.0,
+            "mrr": 1.0
+          }
+        },
+        {
+          "id": "q101",
+          "question": "What is the refund policy for cancelled flights?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.5054,
+          "latency_ms": 29.5,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 34,
+              "score": 0.5054
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.4788
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 35,
+              "score": 0.466
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 22,
+              "score": 0.4475
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.4371
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 9,
+              "chunk_index": 17,
+              "score": 0.4337
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 23,
+              "score": 0.4245
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 21,
+              "score": 0.4096
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 4,
+              "score": 0.4052
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 16,
+              "chunk_index": 30,
+              "score": 0.4051
+            }
+          ]
+        },
+        {
+          "id": "q102",
+          "question": "Who won the 2018 football World Cup?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4818,
+          "latency_ms": 27.2,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 3,
+              "chunk_index": 5,
+              "score": 0.4818
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 19,
+              "score": 0.467
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 6,
+              "chunk_index": 10,
+              "score": 0.465
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 4,
+              "chunk_index": 7,
+              "score": 0.4596
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 28,
+              "score": 0.4492
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 14,
+              "chunk_index": 27,
+              "score": 0.4484
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 2,
+              "chunk_index": 2,
+              "score": 0.4426
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.4424
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 10,
+              "chunk_index": 18,
+              "score": 0.4406
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 22,
+              "score": 0.4325
+            }
+          ]
+        },
+        {
+          "id": "q103",
+          "question": "How do I bake sourdough bread?",
+          "type": "off_topic",
+          "split": "dev",
+          "answerable": false,
+          "best_dense": 0.4564,
+          "latency_ms": 27.1,
+          "retrieved": [
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 15,
+              "score": 0.4564
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 18,
+              "chunk_index": 34,
+              "score": 0.4516
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 5,
+              "chunk_index": 8,
+              "score": 0.4313
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 20,
+              "score": 0.425
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 8,
+              "chunk_index": 14,
+              "score": 0.4108
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 19,
+              "chunk_index": 35,
+              "score": 0.4061
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 13,
+              "chunk_index": 26,
+              "score": 0.3965
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 21,
+              "score": 0.3868
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 12,
+              "chunk_index": 24,
+              "score": 0.3797
+            },
+            {
+              "document": "brochure.pdf",
+              "page": 11,
+              "chunk_index": 22,
+              "score": 0.3763
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

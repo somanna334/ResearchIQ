@@ -1,0 +1,12 @@
+{
+  "dataset": "eval/datasets/v1.jsonl",
+  "k": 5,
+  "experiments": [
+    {"name": "baseline", "chunk": {"strategy": "fixed", "chunk_size": 800, "overlap": 150}, "mode": "semantic"},
+    {"name": "hybrid", "chunk": {"strategy": "fixed", "chunk_size": 800, "overlap": 150}, "mode": "hybrid"},
+    {"name": "hybrid-rerank", "chunk": {"strategy": "fixed", "chunk_size": 800, "overlap": 150}, "mode": "hybrid_rerank"},
+    {"name": "chunks-400", "chunk": {"strategy": "fixed", "chunk_size": 400, "overlap": 80}, "mode": "semantic"},
+    {"name": "chunks-1200", "chunk": {"strategy": "fixed", "chunk_size": 1200, "overlap": 200}, "mode": "semantic"},
+    {"name": "sentence-800", "chunk": {"strategy": "sentence", "chunk_size": 800, "overlap": 150}, "mode": "semantic"}
+  ]
+}
