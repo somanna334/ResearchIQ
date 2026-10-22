@@ -6,7 +6,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.api import analysis, ask, chunks, documents, embeddings, evaluation, hybrid, search
+from app.api import (
+    analysis,
+    ask,
+    auth,
+    chunks,
+    documents,
+    embeddings,
+    evaluation,
+    hybrid,
+    search,
+)
 from app.config import get_settings
 from app.database import init_db
 
@@ -29,19 +39,20 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 def create_app() -> FastAPI:
     settings = get_settings()
-    app = FastAPI(title=settings.app_name, version="0.8.0", lifespan=lifespan)
+    app = FastAPI(title=settings.app_name, version="0.9.0", lifespan=lifespan)
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
         allow_methods=["GET", "POST", "DELETE"],
-        allow_headers=["*"],
+        allow_headers=["Authorization", "Content-Type"],
     )
 
     @app.get("/health", response_model=HealthResponse)
     def health() -> HealthResponse:
         return HealthResponse(status="ok")
 
+    app.include_router(auth.router)
     app.include_router(documents.router)
     app.include_router(chunks.router)
     app.include_router(search.router)

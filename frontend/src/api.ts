@@ -1,3 +1,5 @@
+import { clearToken, getToken, notifyUnauthorized } from "./session";
+
 export const API_URL: string =
   import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -78,11 +80,21 @@ export class ApiError extends Error {
 }
 
 export async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers);
+  const token = getToken();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, init);
+    res = await fetch(`${API_URL}${path}`, { ...init, headers });
   } catch {
     throw new ApiError(0, "Cannot reach the backend. Is it running on " + API_URL + "?");
+  }
+
+  if (res.status === 401 && token) {
+    // The session expired or was ended elsewhere: return to the sign-in screen.
+    clearToken();
+    notifyUnauthorized();
   }
 
   if (!res.ok) {

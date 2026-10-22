@@ -6,12 +6,13 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.auth.deps import CurrentUser, get_owned_document, resolve_document_ids
 from app.chunking.service import default_chunk_config
 from app.config import Settings, get_settings
 from app.database import get_db
 from app.embeddings.embedder import Embedder, get_embedder
 from app.embeddings.service import embed_chunk_set
-from app.models import Chunk, Document
+from app.models import Chunk
 from app.retrieval.semantic import semantic_search
 from app.schemas import SearchHitOut
 
@@ -29,14 +30,14 @@ class EmbedStatsOut(BaseModel):
 @router.post("/documents/{document_id}/embeddings", response_model=EmbedStatsOut)
 def embed_document(
     document_id: str,
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     embedder: Annotated[Embedder, Depends(get_embedder)],
     chunk_config: Annotated[str | None, Query(max_length=64)] = None,
 ) -> EmbedStatsOut:
     """Embed a document's chunk set. Safe to repeat: only missing vectors are computed."""
-    if db.get(Document, document_id) is None:
-        raise HTTPException(status_code=404, detail="Document not found")
+    get_owned_document(db, user, document_id)
     key = chunk_config or default_chunk_config(settings).key
     chunk_total = db.scalar(
         select(func.count())
@@ -59,6 +60,7 @@ def embed_document(
 
 @router.get("/search/semantic", response_model=list[SearchHitOut])
 def search_semantic(
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     embedder: Annotated[Embedder, Depends(get_embedder)],
@@ -71,11 +73,12 @@ def search_semantic(
         Query(description="Force pgvector ('sql') or NumPy ('python'). Default: auto."),
     ] = None,
 ) -> list[SearchHitOut]:
-    """Semantic search. `score` is cosine similarity. It never returns 'no match'."""
+    """Semantic search over the signed-in user's documents. It never returns 'no match'."""
     key = chunk_config or default_chunk_config(settings).key
     if method == "sql" and db.get_bind().dialect.name != "postgresql":
         raise HTTPException(status_code=400, detail="method=sql needs PostgreSQL")
-    hits = semantic_search(db, embedder, q, k, key, document_id, method)
+    document_ids = resolve_document_ids(db, user, document_id)
+    hits = semantic_search(db, embedder, q, k, key, document_ids, method)
     return [
         SearchHitOut(
             chunk_id=h.chunk.id,

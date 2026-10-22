@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.auth.deps import CurrentUser, resolve_document_ids
 from app.chunking.service import default_chunk_config
 from app.config import Settings, get_settings
 from app.database import get_db
@@ -29,6 +30,7 @@ class HybridHitOut(BaseModel):
 
 @router.get("/search/hybrid", response_model=list[HybridHitOut])
 def search_hybrid(
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     embedder: Annotated[Embedder, Depends(get_embedder)],
@@ -42,8 +44,9 @@ def search_hybrid(
     """BM25 + vector search merged with RRF, optionally reranked. Shows every component score."""
     key = chunk_config or default_chunk_config(settings).key
     mode = "hybrid_rerank" if rerank else "hybrid"
+    document_ids = resolve_document_ids(db, user, document_id)
     result = retrieve(
-        db, embedder, reranker, q, k, key, document_id, mode,
+        db, embedder, reranker, q, k, key, document_ids, mode,
         settings.candidate_pool, settings.rrf_k,
     )
     return [

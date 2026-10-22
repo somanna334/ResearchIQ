@@ -17,7 +17,8 @@ def _base_filters(stmt, embedder: Embedder, chunk_config: str, document_ids):
         Embedding.model_name == embedder.model_name,
         Embedding.dimension == embedder.dimension,
     )
-    if document_ids:
+    # None means no filter. An empty list means "match nothing" (fail closed).
+    if document_ids is not None:
         stmt = stmt.where(Chunk.document_id.in_(document_ids))
     return stmt
 

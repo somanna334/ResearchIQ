@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from app.auth.deps import CurrentUser, resolve_document_ids
 from app.chunking.service import default_chunk_config
 from app.config import Settings, get_settings
 from app.database import get_db
@@ -14,6 +15,7 @@ router = APIRouter(tags=["search"])
 
 @router.get("/search", response_model=list[SearchHitOut])
 def search(
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     q: Annotated[str, Query(min_length=1, max_length=500)],
@@ -21,9 +23,10 @@ def search(
     document_id: Annotated[list[str] | None, Query()] = None,
     chunk_config: Annotated[str | None, Query(max_length=64)] = None,
 ) -> list[SearchHitOut]:
-    """Keyword (BM25) search. Baseline retrieval; embeddings come in Milestone 4."""
+    """Keyword (BM25) search over the signed-in user's documents."""
     key = chunk_config or default_chunk_config(settings).key
-    hits = keyword_search(db, q, k, key, document_id)
+    document_ids = resolve_document_ids(db, user, document_id)
+    hits = keyword_search(db, q, k, key, document_ids)
     return [
         SearchHitOut(
             chunk_id=h.chunk.id,

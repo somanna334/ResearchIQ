@@ -39,8 +39,7 @@ class Settings(BaseSettings):
     candidate_pool: int = 20
     rrf_k: int = 60
     reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
-    # Refusal threshold on the best dense cosine similarity. Choose it from the
-    # evaluation report's threshold table, then set it in .env.
+    # Refusal threshold on the best dense cosine similarity.
     min_top_score: float = 0.58
 
     # LLM (SecretStr keeps the key out of logs and repr output)
@@ -52,7 +51,17 @@ class Settings(BaseSettings):
     # Evaluation
     eval_results_dir: Path = Path("eval/results")
     judge_model: str | None = None  # None means: use llm_model
-    eval_requests_per_minute: int = 8  # keep under your provider's limit
+    eval_requests_per_minute: int = 8
+
+    # Accounts and sessions
+    session_ttl_hours: int = 24 * 7
+    allow_registration: bool = True
+    # Comma-separated emails allowed to use the evaluation endpoints.
+    admin_emails: str = ""
+    # Argon2id cost (RFC 9106 low-memory profile). Tests lower these to run fast.
+    argon2_time_cost: int = 3
+    argon2_memory_kib: int = 65536
+    argon2_parallelism: int = 4
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -63,6 +72,10 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def admin_email_list(self) -> set[str]:
+        return {e.strip().lower() for e in self.admin_emails.split(",") if e.strip()}
 
     @property
     def upload_dir(self) -> Path:

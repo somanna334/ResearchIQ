@@ -3,12 +3,13 @@ import logging
 import uuid
 from pathlib import Path
 from typing import Annotated
-from app.chunking.service import build_chunks, default_chunk_config
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.auth.deps import CurrentUser, get_owned_document
+from app.chunking.service import build_chunks, default_chunk_config
 from app.config import Settings, get_settings
 from app.database import get_db
 from app.ingestion.pdf import PdfExtractionError, extract_pdf
@@ -49,16 +50,10 @@ def _check_pdf_header(path: Path) -> None:
             raise HTTPException(status_code=400, detail="File is not a valid PDF")
 
 
-def _get_document_or_404(db: Session, document_id: str) -> Document:
-    document = db.get(Document, document_id)
-    if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
-    return document
-
-
 @router.post("", response_model=DocumentOut, status_code=201)
 def upload_document(
     file: Annotated[UploadFile, File()],
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> Document:
@@ -80,6 +75,7 @@ def upload_document(
 
     document = Document(
         id=document_id,
+        owner_id=user.id,
         filename=filename,
         size_bytes=size,
         sha256=sha256,
@@ -128,21 +124,33 @@ def upload_document(
 
 
 @router.get("", response_model=list[DocumentOut])
-def list_documents(db: Annotated[Session, Depends(get_db)]) -> list[Document]:
-    return list(db.scalars(select(Document).order_by(Document.created_at.desc())))
+def list_documents(
+    user: CurrentUser, db: Annotated[Session, Depends(get_db)]
+) -> list[Document]:
+    return list(
+        db.scalars(
+            select(Document)
+            .where(Document.owner_id == user.id)
+            .order_by(Document.created_at.desc())
+        )
+    )
 
 
 @router.get("/{document_id}", response_model=DocumentOut)
 def get_document(
-    document_id: str, db: Annotated[Session, Depends(get_db)]
+    document_id: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]
 ) -> Document:
-    return _get_document_or_404(db, document_id)
+    return get_owned_document(db, user, document_id)
 
 
 @router.get("/{document_id}/pages/{page_number}", response_model=PageOut)
 def get_page(
-    document_id: str, page_number: int, db: Annotated[Session, Depends(get_db)]
+    document_id: str,
+    page_number: int,
+    user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
 ) -> Page:
+    get_owned_document(db, user, document_id)
     page = db.scalar(
         select(Page).where(
             Page.document_id == document_id, Page.page_number == page_number
@@ -156,10 +164,11 @@ def get_page(
 @router.delete("/{document_id}", status_code=204)
 def delete_document(
     document_id: str,
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> None:
-    document = _get_document_or_404(db, document_id)
-    db.delete(document)  # pages are deleted too (cascade)
+    document = get_owned_document(db, user, document_id)
+    db.delete(document)  # pages and chunks (and their vectors) go too
     db.commit()
     (settings.upload_dir / f"{document_id}.pdf").unlink(missing_ok=True)

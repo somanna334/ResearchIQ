@@ -17,6 +17,8 @@ from app.embeddings.embedder import get_embedder
 from app.main import app
 from app.retrieval.bm25 import tokenize
 
+TEST_PASSWORD = "correct-horse-battery"
+
 
 class FakeEmbedder:
     """Deterministic stand-in: hashes words into 256 buckets, then normalizes.
@@ -44,9 +46,18 @@ class FakeEmbedder:
         return self._vector(text)
 
 
+def _signed_in_client(email: str) -> TestClient:
+    """A new client, registered through the real endpoint and carrying its token."""
+    other = TestClient(app)
+    response = other.post("/auth/register", json={"email": email, "password": TEST_PASSWORD})
+    assert response.status_code == 201, response.text
+    other.headers["Authorization"] = f"Bearer {response.json()['access_token']}"
+    return other
+
+
 @pytest.fixture
 def client(tmp_path: Path) -> Iterator[TestClient]:
-    """A test client with an in-memory database and a temporary upload folder."""
+    """A signed-in client (admin@example.com) with an in-memory database and temp uploads."""
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
@@ -54,7 +65,14 @@ def client(tmp_path: Path) -> Iterator[TestClient]:
     )
     Base.metadata.create_all(engine)
     settings = Settings(
-        data_dir=tmp_path, max_upload_mb=1, max_pages=5, _env_file=None
+        data_dir=tmp_path,
+        max_upload_mb=1,
+        max_pages=5,
+        admin_emails="admin@example.com",
+        argon2_time_cost=1,
+        argon2_memory_kib=1024,
+        argon2_parallelism=1,
+        _env_file=None,
     )
     embedder = FakeEmbedder()
 
@@ -67,8 +85,14 @@ def client(tmp_path: Path) -> Iterator[TestClient]:
     app.dependency_overrides[get_embedder] = lambda: embedder
     # Deliberately not using `with TestClient(...)`: that would run the app's
     # startup and create the real database file.
-    yield TestClient(app)
+    yield _signed_in_client("admin@example.com")
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def make_client(client: TestClient) -> Callable[[str], TestClient]:
+    """Create another signed-in user (shares the same in-memory database)."""
+    return _signed_in_client
 
 
 @pytest.fixture

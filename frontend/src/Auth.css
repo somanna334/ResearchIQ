@@ -1,0 +1,27 @@
+.auth {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.auth-card {
+  width: min(400px, 100%);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.auth-card h1 { margin: 0 0 0.2rem; font-size: 1.4rem; }
+.auth-card form { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1rem; }
+.auth-card label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; }
+.auth-card input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  background: var(--bg);
+  font: inherit;
+  color: inherit;
+}
+.auth-switch { margin-top: 1rem; text-align: center; }
+.account { margin: 0.4rem 0 0; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }

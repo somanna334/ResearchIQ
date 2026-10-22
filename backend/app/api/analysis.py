@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.ask import ModeName, SourceOut, UsageOut
+from app.auth.deps import CurrentUser, get_owned_document
 from app.chunking.service import default_chunk_config
 from app.config import Settings, get_settings
 from app.database import get_db
@@ -12,7 +13,7 @@ from app.embeddings.embedder import Embedder, get_embedder
 from app.generation.tasks import AnalysisInputError, compare_documents, summarize_document
 from app.llm.base import LLMError, LLMProvider
 from app.llm.factory import get_llm_provider
-from app.models import Document
+from app.models import Document, User
 from app.retrieval.rerank import Reranker, get_reranker
 
 router = APIRouter(tags=["analysis"])
@@ -68,10 +69,8 @@ class CompareResponse(BaseModel):
     retrieval: CompareMetaOut
 
 
-def _ready_document(db: Session, document_id: str) -> Document:
-    document = db.get(Document, document_id)
-    if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
+def _ready_document(db: Session, user: User, document_id: str) -> Document:
+    document = get_owned_document(db, user, document_id)
     if document.status != "ready":
         raise HTTPException(
             status_code=409, detail=f"'{document.filename}' has no extractable text"
@@ -92,12 +91,13 @@ def _sources_out(sources, cited_tags) -> list[SourceOut]:
 @router.post("/documents/{document_id}/summary", response_model=SummaryResponse)
 def summarize(
     document_id: str,
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     llm: Annotated[LLMProvider, Depends(get_llm_provider)],
 ) -> SummaryResponse:
     """Bullet-point summary with citations. Long documents are sampled evenly."""
-    document = _ready_document(db, document_id)
+    document = _ready_document(db, user, document_id)
     try:
         result = summarize_document(db, llm, document, default_chunk_config(settings).key)
     except AnalysisInputError as exc:
@@ -129,16 +129,17 @@ def summarize(
 @router.post("/compare", response_model=CompareResponse)
 def compare(
     body: CompareRequest,
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     embedder: Annotated[Embedder, Depends(get_embedder)],
     reranker: Annotated[Reranker, Depends(get_reranker)],
     llm: Annotated[LLMProvider, Depends(get_llm_provider)],
 ) -> CompareResponse:
-    """Compare 2 or 3 documents on a question, with evidence retrieved from each."""
+    """Compare 2 or 3 of the user's documents, with evidence retrieved from each."""
     if len(set(body.document_ids)) != len(body.document_ids):
         raise HTTPException(status_code=400, detail="Choose different documents to compare")
-    documents = [_ready_document(db, document_id) for document_id in body.document_ids]
+    documents = [_ready_document(db, user, document_id) for document_id in body.document_ids]
     key = body.chunk_config or default_chunk_config(settings).key
     mode = body.mode or settings.retrieval_mode
     try:

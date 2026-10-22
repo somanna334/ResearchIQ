@@ -20,13 +20,17 @@ def keyword_search(
     chunk_config: str,
     document_ids: list[str] | None = None,
 ) -> list[SearchHit]:
-    """BM25 search over one chunk set. The index is rebuilt on every call (MVP)."""
+    """BM25 search over one chunk set. The index is rebuilt on every call (MVP).
+
+    document_ids=None means no filter. An empty list means "match nothing":
+    it must never fall back to searching everything.
+    """
     query_tokens = tokenize(query)
     if not query_tokens:
         return []
 
     stmt = select(Chunk).where(Chunk.chunk_config == chunk_config)
-    if document_ids:
+    if document_ids is not None:
         stmt = stmt.where(Chunk.document_id.in_(document_ids))
     chunks = list(db.scalars(stmt))
     if not chunks:

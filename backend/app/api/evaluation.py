@@ -7,9 +7,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.config import Settings, get_settings
+from app.auth.deps import require_admin
 from app.evaluation.summary import answer_summary, gate_summary, retrieval_summary
 
-router = APIRouter(prefix="/eval", tags=["evaluation"])
+router = APIRouter(
+    prefix="/eval", tags=["evaluation"], dependencies=[Depends(require_admin)]
+)
 
 # Only names the runners generate. This also blocks path tricks like "..".
 RUN_ID = re.compile(r"^\d{8}T\d{6}Z(-answers)?$")

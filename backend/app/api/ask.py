@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from app.auth.deps import CurrentUser, resolve_document_ids
 from app.chunking.service import default_chunk_config
 from app.config import Settings, get_settings
 from app.database import get_db
@@ -63,19 +64,21 @@ class AskResponse(BaseModel):
 @router.post("/ask", response_model=AskResponse)
 def ask(
     body: AskRequest,
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     embedder: Annotated[Embedder, Depends(get_embedder)],
     reranker: Annotated[Reranker, Depends(get_reranker)],
     llm: Annotated[LLMProvider, Depends(get_llm_provider)],
 ) -> AskResponse:
-    """Answer from the documents, with validated citations."""
+    """Answer from the signed-in user's documents, with validated citations."""
     key = body.chunk_config or default_chunk_config(settings).key
     mode = body.mode or settings.retrieval_mode
+    document_ids = resolve_document_ids(db, user, body.document_ids)
     try:
         result = answer_question(
             db, settings, embedder, reranker, llm, body.question, body.k, key,
-            body.document_ids, mode,
+            document_ids, mode,
         )
     except LLMError as exc:
         raise HTTPException(

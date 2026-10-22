@@ -87,7 +87,12 @@ def _answers(run_id):
 def results_dir(client, tmp_path):
     folder = tmp_path / "results"
     folder.mkdir()
-    settings = Settings(data_dir=tmp_path, eval_results_dir=folder, _env_file=None)
+    settings = Settings(
+        data_dir=tmp_path,
+        eval_results_dir=folder,
+        admin_emails="admin@example.com",
+        _env_file=None,
+    )
     app.dependency_overrides[get_settings] = lambda: settings
     (folder / "20261019T100000Z.json").write_text(json.dumps(_retrieval("20261019T100000Z")))
     (folder / "20261020T100000Z-answers.json").write_text(json.dumps(_answers("20261020T100000Z-answers")))

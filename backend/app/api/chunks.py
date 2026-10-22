@@ -4,32 +4,27 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.auth.deps import CurrentUser, get_owned_document
 from app.chunking.service import build_chunks, default_chunk_config
 from app.chunking.strategies import ChunkConfig
 from app.config import Settings, get_settings
 from app.database import get_db
-from app.models import Chunk, Document
+from app.models import Chunk
 from app.schemas import ChunkOut, ChunkStatsOut
 
 router = APIRouter(prefix="/documents/{document_id}/chunks", tags=["chunks"])
 
 
-def _get_document_or_404(db: Session, document_id: str) -> Document:
-    document = db.get(Document, document_id)
-    if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
-    return document
-
-
 @router.post("", response_model=ChunkStatsOut)
 def rechunk_document(
     document_id: str,
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     config: Annotated[ChunkConfig | None, Body()] = None,
 ) -> ChunkStatsOut:
     """Build (or rebuild) a chunk set. With no body, uses the default configuration."""
-    document = _get_document_or_404(db, document_id)
+    document = get_owned_document(db, user, document_id)
     if document.status != "ready":
         raise HTTPException(
             status_code=409, detail="Document has no extractable text to chunk"
@@ -41,6 +36,7 @@ def rechunk_document(
 @router.get("", response_model=list[ChunkOut])
 def list_chunks(
     document_id: str,
+    user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
     chunk_config: Annotated[str | None, Query(max_length=64)] = None,
@@ -48,7 +44,7 @@ def list_chunks(
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> list[Chunk]:
-    _get_document_or_404(db, document_id)
+    get_owned_document(db, user, document_id)
     key = chunk_config or default_chunk_config(settings).key
     stmt = select(Chunk).where(
         Chunk.document_id == document_id, Chunk.chunk_config == key
