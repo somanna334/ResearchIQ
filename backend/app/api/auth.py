@@ -1,7 +1,8 @@
+import hmac
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from sqlalchemy import delete, select
@@ -22,6 +23,7 @@ from app.auth.security import (
 from app.config import Settings, get_settings
 from app.database import get_db
 from app.models import AuthSession, User
+from app.ratelimit import LoginThrottle, auth_rate_limit, client_ip, too_many
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -29,6 +31,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 class RegisterRequest(BaseModel):
     email: str = Field(min_length=3, max_length=254)
     password: str = Field(min_length=10, max_length=128)
+    invite_code: str | None = Field(None, max_length=128)
 
 
 class LoginRequest(BaseModel):
@@ -63,7 +66,21 @@ def _issue_token(db: Session, settings: Settings, user: User) -> TokenOut:
     )
 
 
-@router.post("/register", response_model=TokenOut, status_code=201)
+def _check_invite(settings: Settings, supplied: str | None) -> None:
+    """Constant-time comparison; the same answer for 'missing' and 'wrong'."""
+    if settings.invite_code is None:
+        return
+    expected = settings.invite_code.get_secret_value().encode()
+    if not hmac.compare_digest((supplied or "").encode(), expected):
+        raise HTTPException(status_code=403, detail="A valid invite code is required")
+
+
+@router.post(
+    "/register",
+    response_model=TokenOut,
+    status_code=201,
+    dependencies=[Depends(auth_rate_limit)],
+)
 def register(
     body: RegisterRequest,
     db: Annotated[Session, Depends(get_db)],
@@ -71,6 +88,8 @@ def register(
 ) -> TokenOut:
     if not settings.allow_registration:
         raise HTTPException(status_code=403, detail="Registration is disabled")
+    # Before anything that reveals whether an email is taken.
+    _check_invite(settings, body.invite_code)
     email = normalize_email(body.email)
     if not is_valid_email(email):
         raise HTTPException(status_code=422, detail="Enter a valid email address")
@@ -89,19 +108,33 @@ def register(
     return _issue_token(db, settings, user)
 
 
-@router.post("/login", response_model=TokenOut)
+@router.post(
+    "/login", response_model=TokenOut, dependencies=[Depends(auth_rate_limit)]
+)
 def login(
     body: LoginRequest,
+    request: Request,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> TokenOut:
+    email = normalize_email(body.email)
+    throttle = LoginThrottle(settings, client_ip(request, settings), email)
+    wait = throttle.wait_seconds()
+    if wait:
+        # Checked before any password work, and the same for real and unknown
+        # emails, so it reveals nothing about which accounts exist.
+        raise too_many(wait, "failed sign-in attempts")
+
     failure = HTTPException(status_code=401, detail="Incorrect email or password")
-    user = db.scalar(select(User).where(User.email == normalize_email(body.email)))
+    user = db.scalar(select(User).where(User.email == email))
     if user is None:
         verify_password(settings, dummy_hash(settings), body.password)  # equalize timing
+        throttle.record_failure()
         raise failure
     if not verify_password(settings, user.password_hash, body.password):
+        throttle.record_failure()
         raise failure
+    throttle.record_success()
     if needs_rehash(settings, user.password_hash):
         user.password_hash = hash_password(settings, body.password)
         db.commit()

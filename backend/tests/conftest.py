@@ -15,6 +15,7 @@ from app.config import Settings, get_settings
 from app.database import Base, get_db
 from app.embeddings.embedder import get_embedder
 from app.main import app
+from app.ratelimit import reset_limiters
 from app.retrieval.bm25 import tokenize
 
 TEST_PASSWORD = "correct-horse-battery"
@@ -55,6 +56,14 @@ def _signed_in_client(email: str) -> TestClient:
     return other
 
 
+@pytest.fixture(autouse=True)
+def _fresh_limiters() -> Iterator[None]:
+    """Rate-limit counters live in memory, so every test starts from zero."""
+    reset_limiters()
+    yield
+    reset_limiters()
+
+
 @pytest.fixture
 def client(tmp_path: Path) -> Iterator[TestClient]:
     """A signed-in client (admin@example.com) with an in-memory database and temp uploads."""
@@ -72,6 +81,11 @@ def client(tmp_path: Path) -> Iterator[TestClient]:
         argon2_time_cost=1,
         argon2_memory_kib=1024,
         argon2_parallelism=1,
+        # Generous limits, so only the tests that tune them ever hit one.
+        auth_requests_per_minute=1000,
+        llm_requests_per_minute=1000,
+        upload_requests_per_minute=1000,
+        login_max_failures=50,
         _env_file=None,
     )
     embedder = FakeEmbedder()
@@ -87,6 +101,19 @@ def client(tmp_path: Path) -> Iterator[TestClient]:
     # startup and create the real database file.
     yield _signed_in_client("admin@example.com")
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def tune(client: TestClient) -> Callable[..., Settings]:
+    """Change settings for the rest of a test: tune(max_documents_per_user=2)."""
+
+    def _tune(**changes: object) -> Settings:
+        current = app.dependency_overrides[get_settings]()
+        patched = current.model_copy(update=changes)
+        app.dependency_overrides[get_settings] = lambda: patched
+        return patched
+
+    return _tune
 
 
 @pytest.fixture

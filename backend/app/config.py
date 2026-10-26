@@ -56,12 +56,30 @@ class Settings(BaseSettings):
     # Accounts and sessions
     session_ttl_hours: int = 24 * 7
     allow_registration: bool = True
+    # When set, registering requires this code. None means anyone may register.
+    invite_code: SecretStr | None = None
     # Comma-separated emails allowed to use the evaluation endpoints.
     admin_emails: str = ""
     # Argon2id cost (RFC 9106 low-memory profile). Tests lower these to run fast.
     argon2_time_cost: int = 3
     argon2_memory_kib: int = 65536
     argon2_parallelism: int = 4
+
+    # Abuse protection. A limit of 0 turns that limit off.
+    login_max_failures: int = 5  # failed sign-ins per (client, email) per window
+    login_window_seconds: int = 15 * 60
+    auth_requests_per_minute: int = 20  # register + login, per client address
+    llm_requests_per_minute: int = 12  # /ask and analysis, per user
+    upload_requests_per_minute: int = 10  # per user
+    max_documents_per_user: int = 50
+    max_storage_mb_per_user: float = 200
+    # How many reverse proxies sit in front of the app (0 = none, ignore
+    # X-Forwarded-For). Set this only if the proxies really exist.
+    trusted_proxy_count: int = 0
+
+    # Logging
+    log_level: str = "INFO"
+    log_format: Literal["text", "json"] = "text"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -84,6 +102,10 @@ class Settings(BaseSettings):
     @property
     def max_upload_bytes(self) -> int:
         return self.max_upload_mb * 1024 * 1024
+
+    @property
+    def max_storage_bytes_per_user(self) -> int:
+        return int(self.max_storage_mb_per_user * 1024 * 1024)
 
 
 @lru_cache

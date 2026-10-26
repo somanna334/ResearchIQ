@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.auth.deps import CurrentUser, get_owned_document
@@ -14,6 +14,7 @@ from app.config import Settings, get_settings
 from app.database import get_db
 from app.ingestion.pdf import PdfExtractionError, extract_pdf
 from app.models import Document, Page
+from app.ratelimit import upload_rate_limit
 from app.schemas import DocumentOut, PageOut
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,33 @@ def _check_pdf_header(path: Path) -> None:
             raise HTTPException(status_code=400, detail="File is not a valid PDF")
 
 
-@router.post("", response_model=DocumentOut, status_code=201)
+def _bytes_in_use(db: Session, user_id: str, settings: Settings) -> int:
+    """Checks the document-count quota and returns the bytes this user already stores.
+
+    Both quota checks are read-then-write, so two simultaneous uploads can overshoot
+    a limit slightly. That is acceptable for a quota (it is not a security boundary).
+    """
+    count, used = db.execute(
+        select(func.count(Document.id), func.coalesce(func.sum(Document.size_bytes), 0))
+        .where(Document.owner_id == user_id)
+    ).one()
+    if count >= settings.max_documents_per_user:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                f"Document limit reached ({settings.max_documents_per_user}). "
+                "Delete a document to upload another."
+            ),
+        )
+    return int(used)
+
+
+@router.post(
+    "",
+    response_model=DocumentOut,
+    status_code=201,
+    dependencies=[Depends(upload_rate_limit)],
+)
 def upload_document(
     file: Annotated[UploadFile, File()],
     user: CurrentUser,
@@ -61,6 +88,8 @@ def upload_document(
     if not filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only .pdf files are accepted")
 
+    used_bytes = _bytes_in_use(db, user.id, settings)
+
     settings.upload_dir.mkdir(parents=True, exist_ok=True)
     document_id = str(uuid.uuid4())
     # The stored name comes from us, never from the client.
@@ -69,6 +98,14 @@ def upload_document(
     try:
         size, sha256 = _save_upload(file, path, settings.max_upload_bytes)
         _check_pdf_header(path)
+        if used_bytes + size > settings.max_storage_bytes_per_user:
+            raise HTTPException(
+                status_code=403,
+                detail=(
+                    f"Storage limit reached ({settings.max_storage_mb_per_user:g} MB). "
+                    "Delete a document to free space."
+                ),
+            )
     except Exception:
         path.unlink(missing_ok=True)
         raise
