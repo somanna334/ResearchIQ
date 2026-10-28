@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeEmail, validateRegistration } from "./authForm";
+import { normalizeEmail, registrationBody, validateRegistration } from "./authForm";
 
 describe("validateRegistration", () => {
   it("accepts a valid email and a long matching password", () => {
@@ -23,5 +23,22 @@ describe("validateRegistration", () => {
 describe("normalizeEmail", () => {
   it("trims and lowercases", () => {
     expect(normalizeEmail("  Ann@Example.COM ")).toBe("ann@example.com");
+  });
+});
+
+describe("registrationBody", () => {
+  it("leaves the invite code out when none was typed", () => {
+    expect(registrationBody(" ann@example.com ", "pw-pw-pw-pw-1", "   ")).toEqual({
+      email: "ann@example.com",
+      password: "pw-pw-pw-pw-1",
+    });
+  });
+
+  it("includes a trimmed invite code when one was typed", () => {
+    expect(registrationBody("ann@example.com", "pw-pw-pw-pw-1", " open-sesame ")).toEqual({
+      email: "ann@example.com",
+      password: "pw-pw-pw-pw-1",
+      invite_code: "open-sesame",
+    });
   });
 });

@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from functools import lru_cache
 from typing import Protocol
 
@@ -60,3 +61,12 @@ def get_embedder() -> Embedder:
         settings.embedding_batch_size,
         settings.embedding_query_prefix,
     )
+
+
+def get_embedder_factory() -> Callable[[], Embedder]:
+    """FastAPI dependency that hands out the loader itself, not the loaded model.
+
+    Background indexing calls it inside the worker thread, so the slow first model
+    load happens there instead of blocking the upload request.
+    """
+    return get_embedder

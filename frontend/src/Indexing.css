@@ -1,0 +1,28 @@
+/* Milestone 9C: background indexing and follow-up questions.
+   Kept separate from App.css so the existing styles are not rewritten. */
+
+.status.processing {
+  color: #b45309;
+  animation: riq-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes riq-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status.processing {
+    animation: none;
+  }
+}
+
+/* "Searched for: ..." line under a question that was rewritten */
+.searched {
+  margin: 0.25rem 0 0.5rem;
+}

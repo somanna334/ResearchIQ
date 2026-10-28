@@ -6,14 +6,14 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 from reportlab.pdfgen import canvas
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
 from app import models  # noqa: F401  (registers tables)
 from app.config import Settings, get_settings
 from app.database import Base, get_db
-from app.embeddings.embedder import get_embedder
+from app.embeddings.embedder import get_embedder, get_embedder_factory
 from app.main import app
 from app.ratelimit import reset_limiters
 from app.retrieval.bm25 import tokenize
@@ -65,14 +65,28 @@ def _fresh_limiters() -> Iterator[None]:
 
 
 @pytest.fixture
-def client(tmp_path: Path) -> Iterator[TestClient]:
-    """A signed-in client (admin@example.com) with an in-memory database and temp uploads."""
+def db_engine() -> Iterator[Engine]:
+    """The in-memory test database. Tests that need to look inside it use this."""
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
     Base.metadata.create_all(engine)
+    yield engine
+    engine.dispose()
+
+
+@pytest.fixture
+def fake_embedder() -> FakeEmbedder:
+    return FakeEmbedder()
+
+
+@pytest.fixture
+def client(
+    tmp_path: Path, db_engine: Engine, fake_embedder: FakeEmbedder
+) -> Iterator[TestClient]:
+    """A signed-in client (admin@example.com) with an in-memory database and temp uploads."""
     settings = Settings(
         data_dir=tmp_path,
         max_upload_mb=1,
@@ -86,17 +100,21 @@ def client(tmp_path: Path) -> Iterator[TestClient]:
         llm_requests_per_minute=1000,
         upload_requests_per_minute=1000,
         login_max_failures=50,
+        # Existing tests expect "ready" in the upload response, so indexing runs
+        # inline (no embedding). Tests of background indexing switch it on with tune().
+        background_indexing=False,
         _env_file=None,
     )
-    embedder = FakeEmbedder()
 
     def override_db() -> Iterator[Session]:
-        with Session(engine) as session:
+        with Session(db_engine) as session:
             yield session
 
     app.dependency_overrides[get_db] = override_db
     app.dependency_overrides[get_settings] = lambda: settings
-    app.dependency_overrides[get_embedder] = lambda: embedder
+    app.dependency_overrides[get_embedder] = lambda: fake_embedder
+    # The indexing worker asks for a loader, not a loaded model.
+    app.dependency_overrides[get_embedder_factory] = lambda: (lambda: fake_embedder)
     # Deliberately not using `with TestClient(...)`: that would run the app's
     # startup and create the real database file.
     yield _signed_in_client("admin@example.com")

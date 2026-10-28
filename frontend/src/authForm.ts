@@ -23,3 +23,15 @@ export function validateRegistration(
   if (password !== confirm) return "The passwords don't match.";
   return null;
 }
+
+// The invite code is sent only when the person typed one.
+export function registrationBody(
+  email: string,
+  password: string,
+  inviteCode: string,
+): Record<string, string> {
+  const body: Record<string, string> = { email: email.trim(), password };
+  const code = inviteCode.trim();
+  if (code) body.invite_code = code;
+  return body;
+}

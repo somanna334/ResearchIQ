@@ -1,4 +1,5 @@
 import { request } from "./api";
+import { registrationBody } from "./authForm";
 
 export interface User {
   id: string;
@@ -15,11 +16,15 @@ export interface TokenResponse {
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
-export function register(email: string, password: string): Promise<TokenResponse> {
+export function register(
+  email: string,
+  password: string,
+  inviteCode = "",
+): Promise<TokenResponse> {
   return request<TokenResponse>("/auth/register", {
     method: "POST",
     headers: JSON_HEADERS,
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify(registrationBody(email, password, inviteCode)),
   });
 }
 

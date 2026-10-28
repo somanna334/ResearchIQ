@@ -18,7 +18,8 @@ from app.api import (
     search,
 )
 from app.config import get_settings
-from app.database import init_db
+from app.database import get_engine, init_db
+from app.ingestion.pipeline import recover_interrupted_documents
 from app.middleware import (
     RequestContextMiddleware,
     SecurityHeadersMiddleware,
@@ -36,6 +37,10 @@ class HealthResponse(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     init_db()
+    # Documents still "processing" belong to a server that is gone (background
+    # tasks live in this process). Mark them failed so the user can press Retry.
+    # This is only correct while exactly one server process runs.
+    recover_interrupted_documents(get_engine())
     yield
 
 

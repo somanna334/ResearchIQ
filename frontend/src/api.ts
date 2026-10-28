@@ -61,6 +61,15 @@ export interface AskResponse {
     min_top_score: number;
     gated: boolean;
   };
+  // The standalone question that was actually searched, when it differs from what
+  // the user typed. Absent or null when there was no history or no rewrite.
+  rewritten_question?: string | null;
+}
+
+/** One earlier message, sent so the server can resolve "it", "that", and so on. */
+export interface HistoryTurn {
+  role: "user" | "assistant";
+  text: string;
 }
 
 export interface AskRequest {
@@ -68,6 +77,7 @@ export interface AskRequest {
   k: number;
   mode: Mode;
   document_ids?: string[];
+  history?: HistoryTurn[];
 }
 
 export class ApiError extends Error {
@@ -134,6 +144,11 @@ export function deleteDocument(id: string): Promise<void> {
 
 export function indexDocument(id: string): Promise<EmbedStats> {
   return request<EmbedStats>(`/documents/${id}/embeddings`, { method: "POST" });
+}
+
+/** Index a failed document again (the server answers 202 and works in the background). */
+export function retryDocument(id: string): Promise<DocumentInfo> {
+  return request<DocumentInfo>(`/documents/${id}/retry`, { method: "POST" });
 }
 
 export function getPage(documentId: string, pageNumber: number): Promise<PageInfo> {

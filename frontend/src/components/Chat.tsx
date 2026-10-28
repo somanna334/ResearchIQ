@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 import { ask } from "../api";
 import type { AskResponse, Mode } from "../api";
+import { buildHistory } from "../history";
 import AnswerView from "./AnswerView";
 
 interface Turn {
@@ -33,6 +34,8 @@ export default function Chat({ selectedIds, readyCount }: Props) {
   async function send() {
     const question = input.trim();
     if (!question || pending) return;
+    // History comes from the turns BEFORE this one (the new turn is added below).
+    const history = buildHistory(turns);
     const id = nextId.current++;
     setTurns((prev) => [...prev, { id, question, state: "loading" }]);
     setInput("");
@@ -43,6 +46,7 @@ export default function Chat({ selectedIds, readyCount }: Props) {
         k,
         mode,
         document_ids: selectedIds.length > 0 ? selectedIds : undefined,
+        history: history.length > 0 ? history : undefined,
       });
       setTurns((prev) =>
         prev.map((t): Turn => (t.id === id ? { ...t, state: "done", response } : t)),
@@ -55,6 +59,11 @@ export default function Chat({ selectedIds, readyCount }: Props) {
     } finally {
       setPending(false);
     }
+  }
+
+  function newConversation() {
+    setTurns([]);
+    setInput("");
   }
 
   function onSubmit(event: FormEvent) {
@@ -73,7 +82,7 @@ export default function Chat({ selectedIds, readyCount }: Props) {
     selectedIds.length > 0
       ? `Searching ${selectedIds.length} selected document${selectedIds.length === 1 ? "" : "s"}`
       : readyCount > 0
-        ? "Searching all documents"
+        ? "Searching all ready documents"
         : "Upload a PDF to get started";
 
   return (
@@ -91,6 +100,11 @@ export default function Chat({ selectedIds, readyCount }: Props) {
         {turns.map((turn) => (
           <div key={turn.id} className="turn">
             <div className="bubble-q">{turn.question}</div>
+            {turn.state === "done" && turn.response?.rewritten_question && (
+              <p className="searched muted small">
+                Searched for: <em>{turn.response.rewritten_question}</em>
+              </p>
+            )}
             {turn.state === "loading" && <div className="card muted">Thinking…</div>}
             {turn.state === "error" && <div className="card banner bad">{turn.error}</div>}
             {turn.state === "done" && turn.response && <AnswerView response={turn.response} />}
@@ -118,6 +132,14 @@ export default function Chat({ selectedIds, readyCount }: Props) {
               <option value={8}>8</option>
             </select>
           </label>
+          <button
+            type="button"
+            className="link-btn"
+            onClick={newConversation}
+            disabled={pending || turns.length === 0}
+          >
+            New conversation
+          </button>
         </div>
         {mode === "hybrid_rerank" && (
           <p className="muted small">The first reranked request loads a model, so it can be slow.</p>

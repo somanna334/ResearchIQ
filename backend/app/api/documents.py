@@ -1,18 +1,19 @@
 import hashlib
 import logging
 import uuid
+from collections.abc import Callable
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, cast
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from sqlalchemy import func, select
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile
+from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
 from app.auth.deps import CurrentUser, get_owned_document
-from app.chunking.service import build_chunks, default_chunk_config
 from app.config import Settings, get_settings
 from app.database import get_db
-from app.ingestion.pdf import PdfExtractionError, extract_pdf
+from app.embeddings.embedder import Embedder, get_embedder_factory
+from app.ingestion.pipeline import process_document
 from app.models import Document, Page
 from app.ratelimit import upload_rate_limit
 from app.schemas import DocumentOut, PageOut
@@ -21,6 +22,8 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 CHUNK_SIZE = 1024 * 1024  # read uploads 1 MB at a time
+
+EmbedderFactory = Callable[[], Embedder]
 
 
 def _clean_filename(raw: str | None) -> str:
@@ -72,6 +75,28 @@ def _bytes_in_use(db: Session, user_id: str, settings: Settings) -> int:
     return int(used)
 
 
+def _start_indexing(
+    db: Session,
+    background: BackgroundTasks,
+    settings: Settings,
+    embedder_factory: EmbedderFactory,
+    document_id: str,
+) -> None:
+    """Hand a 'processing' document to the indexing pipeline.
+
+    Background mode: schedule it and return (the task runs after the response).
+    Inline mode (tests, background_indexing=False): run it now, without embedding,
+    which is the behaviour from before Milestone 9C.
+    """
+    engine = cast(Engine, db.get_bind())
+    if settings.background_indexing:
+        background.add_task(
+            process_document, engine, settings, embedder_factory, document_id, True
+        )
+    else:
+        process_document(engine, settings, embedder_factory, document_id, False)
+
+
 @router.post(
     "",
     response_model=DocumentOut,
@@ -83,6 +108,8 @@ def upload_document(
     user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
+    background: BackgroundTasks,
+    embedder_factory: Annotated[EmbedderFactory, Depends(get_embedder_factory)],
 ) -> Document:
     filename = _clean_filename(file.filename)
     if not filename.lower().endswith(".pdf"):
@@ -121,42 +148,44 @@ def upload_document(
     db.add(document)
     db.commit()
 
-    try:
-        result = extract_pdf(path, settings.max_pages)
-    except PdfExtractionError as exc:
-        document.status = "failed"
-        document.error_message = str(exc)
-        path.unlink(missing_ok=True)
-        db.commit()
-        db.refresh(document)
-        logger.info("document_failed id=%s reason=%s", document_id, exc)
-        return document
+    _start_indexing(db, background, settings, embedder_factory, document_id)
+    db.refresh(document)  # background mode: still "processing"; inline: the final state
+    return document
 
-    document.pages = [
-        Page(page_number=p.page_number, text=p.text, char_count=len(p.text))
-        for p in result.pages
-    ]
-    document.page_count = result.page_count
-    document.pages_with_text = result.pages_with_text
-    if result.pages_with_text == 0:
-        document.status = "no_text"
-        document.error_message = (
-            "No extractable text found. This looks like a scanned PDF; "
-            "OCR is not supported yet."
+
+@router.post(
+    "/{document_id}/retry",
+    response_model=DocumentOut,
+    status_code=202,
+    dependencies=[Depends(upload_rate_limit)],
+)
+def retry_document(
+    document_id: str,
+    user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    background: BackgroundTasks,
+    embedder_factory: Annotated[EmbedderFactory, Depends(get_embedder_factory)],
+) -> Document:
+    """Index a failed document again, from the file that is still on disk."""
+    document = get_owned_document(db, user, document_id)  # foreign ids: 404
+    path = settings.upload_dir / f"{document_id}.pdf"
+    if document.status != "failed":
+        raise HTTPException(
+            status_code=409, detail="Only a failed document can be retried"
         )
-    else:
-        document.status = "ready"
+    if not path.exists():
+        raise HTTPException(
+            status_code=409,
+            detail="The original file is no longer on the server. Upload it again.",
+        )
+
+    document.status = "processing"
+    document.error_message = None
     db.commit()
-    if document.status == "ready":
-        build_chunks(db, document, default_chunk_config(settings))
+
+    _start_indexing(db, background, settings, embedder_factory, document_id)
     db.refresh(document)
-    logger.info(
-        "document_ingested id=%s status=%s pages=%d pages_with_text=%d",
-        document_id,
-        document.status,
-        document.page_count,
-        document.pages_with_text,
-    )
     return document
 
 

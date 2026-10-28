@@ -22,6 +22,18 @@ class Settings(BaseSettings):
     max_upload_mb: int = 25
     max_pages: int = 500
 
+    # Background indexing. True: an upload returns at once ("processing") and a
+    # background task extracts, chunks and embeds. False: the old inline behaviour
+    # (extract + chunk inside the request, no embedding); the test suite uses it.
+    background_indexing: bool = True
+    # Documents indexed at the same time. Keep at 1 on a small machine.
+    index_concurrency: int = 1
+
+    # Conversation history. It is only ever used to rewrite a follow-up question.
+    history_max_turns: int = 6  # most recent turns the server will look at
+    history_max_chars: int = 600  # each turn is cut to this many characters
+    rewrite_max_chars: int = 300  # longest rewritten question we accept
+
     # Default chunking (can be overridden per request for experiments)
     chunk_strategy: Literal["fixed", "sentence"] = "fixed"
     chunk_size: int = 800

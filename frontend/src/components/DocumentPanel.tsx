@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ChangeEvent, DragEvent } from "react";
-import { deleteDocument, indexDocument, uploadDocument } from "../api";
+import { deleteDocument, indexDocument, retryDocument, uploadDocument } from "../api";
 import type { DocumentInfo } from "../api";
 import { formatBytes, sha256Hex } from "../lib";
 
@@ -16,6 +16,12 @@ interface Props {
 
 function messageOf(err: unknown): string {
   return err instanceof Error ? err.message : "Something went wrong";
+}
+
+function statusLabel(doc: DocumentInfo): string {
+  if (doc.status === "processing") return "indexing…";
+  if (doc.status === "no_text") return "no text";
+  return doc.status;
 }
 
 export default function DocumentPanel({ documents, selected, onToggle, onChanged }: Props) {
@@ -40,14 +46,25 @@ export default function DocumentPanel({ documents, selected, onToggle, onChanged
           continue;
         }
         const hash = await sha256Hex(file);
-        if (hash && documents.some((d) => d.sha256 === hash && d.status === "ready")) {
+        if (
+          hash &&
+          documents.some(
+            (d) => d.sha256 === hash && (d.status === "ready" || d.status === "processing"),
+          )
+        ) {
           setError(`${file.name}: this exact file is already uploaded`);
           continue;
         }
 
         setNote(`Uploading ${file.name}…`);
         const doc = await uploadDocument(file);
+        if (doc.status === "processing") {
+          // The server indexes in the background. The list shows "indexing…" and
+          // App.tsx keeps refreshing it until the document is ready.
+          continue;
+        }
         if (doc.status === "ready") {
+          // The server finished without embedding (inline mode), so do it here.
           setNote(`Indexing ${file.name}… (the first time can take a minute while the model loads)`);
           await indexDocument(doc.id);
         } else {
@@ -84,6 +101,20 @@ export default function DocumentPanel({ documents, selected, onToggle, onChanged
       setNote(`${doc.filename}: ${stats.newly_embedded} new vectors (${stats.total_chunks} chunks)`);
     } catch (err) {
       setNote(null);
+      setError(messageOf(err));
+    } finally {
+      setWorkingId(null);
+    }
+  }
+
+  async function retry(doc: DocumentInfo) {
+    setWorkingId(doc.id);
+    setError(null);
+    try {
+      await retryDocument(doc.id);
+      // The document is "processing" again; refreshing starts the polling in App.tsx.
+      await onChanged();
+    } catch (err) {
       setError(messageOf(err));
     } finally {
       setWorkingId(null);
@@ -146,10 +177,11 @@ export default function DocumentPanel({ documents, selected, onToggle, onChanged
             </label>
             <div className="doc-meta muted small">
               <span className={"status " + doc.status} title={doc.error_message ?? undefined}>
-                {doc.status === "no_text" ? "no text" : doc.status}
+                {statusLabel(doc)}
               </span>
               <span>
-                {doc.page_count} pages · {formatBytes(doc.size_bytes)}
+                {doc.status === "processing" ? "" : `${doc.page_count} pages · `}
+                {formatBytes(doc.size_bytes)}
               </span>
             </div>
             {doc.error_message && doc.status !== "ready" && (
@@ -161,6 +193,11 @@ export default function DocumentPanel({ documents, selected, onToggle, onChanged
                   Re-index
                 </button>
               )}
+              {doc.status === "failed" && (
+                <button className="link-btn" disabled={workingId === doc.id || busy} onClick={() => void retry(doc)}>
+                  Retry
+                </button>
+              )}
               <button className="link-btn danger" disabled={workingId === doc.id || busy} onClick={() => void remove(doc)}>
                 Delete
               </button>
@@ -169,7 +206,8 @@ export default function DocumentPanel({ documents, selected, onToggle, onChanged
         ))}
       </ul>
       <p className="muted small">
-        Nothing selected means all documents are searched. Re-index is safe to repeat: it only
+        Nothing selected means all ready documents are searched. A new document is searchable
+        once its status changes from "indexing…" to "ready". Re-index is safe to repeat: it only
         computes missing vectors.
       </p>
     </div>

@@ -9,6 +9,7 @@ from app.chunking.service import default_chunk_config
 from app.config import Settings, get_settings
 from app.database import get_db
 from app.embeddings.embedder import Embedder, get_embedder
+from app.generation.followup import HistoryTurn, condense_question
 from app.generation.service import answer_question
 from app.llm.base import LLMError, LLMProvider
 from app.llm.factory import get_llm_provider
@@ -25,6 +26,8 @@ class AskRequest(BaseModel):
     document_ids: list[str] | None = None
     chunk_config: str | None = Field(None, max_length=64)
     mode: ModeName | None = Field(None, description="Defaults to the server setting")
+    # Earlier turns of the conversation. Used ONLY to rewrite a follow-up question.
+    history: list[HistoryTurn] = Field(default_factory=list, max_length=12)
 
 
 class SourceOut(BaseModel):
@@ -59,6 +62,9 @@ class AskResponse(BaseModel):
     sources: list[SourceOut]
     usage: UsageOut
     retrieval: RetrievalOut
+    # The standalone question that was actually searched, when it differs from
+    # what the user typed. None when there was no history or no rewrite.
+    rewritten_question: str | None = None
 
 
 @router.post("/ask", response_model=AskResponse)
@@ -75,9 +81,20 @@ def ask(
     key = body.chunk_config or default_chunk_config(settings).key
     mode = body.mode or settings.retrieval_mode
     document_ids = resolve_document_ids(db, user, body.document_ids)
+
+    # History can only change the wording of the question, never what the answering
+    # prompt contains. If the rewrite fails or looks wrong, the original is used.
+    question = condense_question(
+        llm,
+        body.history,
+        body.question,
+        settings.history_max_chars,
+        max_turns=settings.history_max_turns,
+        rewrite_max_chars=settings.rewrite_max_chars,
+    )
     try:
         result = answer_question(
-            db, settings, embedder, reranker, llm, body.question, body.k, key,
+            db, settings, embedder, reranker, llm, question, body.k, key,
             document_ids, mode,
         )
     except LLMError as exc:
@@ -116,4 +133,5 @@ def ask(
             min_top_score=settings.min_top_score,
             gated=result.gated,
         ),
+        rewritten_question=question if question != body.question else None,
     )

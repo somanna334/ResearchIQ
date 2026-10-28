@@ -71,13 +71,21 @@ def resolve_document_ids(
 ) -> list[str]:
     """The document IDs a search may touch: always an explicit list of the user's own.
 
-    None or an empty list means 'all of my documents'. Naming a document the user
-    doesn't own is a 404. The result can be empty, and retrieval treats an empty
-    list as 'match nothing', never as 'no filter'.
+    None or an empty list means 'all of my READY documents' (a document that is
+    still being indexed, or that failed, is not searchable yet). Naming a document
+    explicitly works for any document the user owns; naming one the user doesn't
+    own is a 404. The result can be empty, and retrieval treats an empty list as
+    'match nothing', never as 'no filter'.
     """
-    owned = set(db.scalars(select(Document.id).where(Document.owner_id == user.id)))
     if not requested:
-        return sorted(owned)
+        return sorted(
+            db.scalars(
+                select(Document.id).where(
+                    Document.owner_id == user.id, Document.status == "ready"
+                )
+            )
+        )
+    owned = set(db.scalars(select(Document.id).where(Document.owner_id == user.id)))
     if any(document_id not in owned for document_id in requested):
         raise HTTPException(status_code=404, detail="Document not found")
     return list(dict.fromkeys(requested))

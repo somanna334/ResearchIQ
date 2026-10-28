@@ -16,6 +16,7 @@ export default function LoginView({ onAuthenticated, notice }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -34,7 +35,7 @@ export default function LoginView({ onAuthenticated, notice }: Props) {
       const result =
         mode === "login"
           ? await login(email.trim(), password)
-          : await register(email.trim(), password);
+          : await register(email.trim(), password, inviteCode);
       setToken(result.access_token);
       onAuthenticated(result.user);
     } catch (err) {
@@ -82,6 +83,15 @@ export default function LoginView({ onAuthenticated, notice }: Props) {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   required
+                />
+              </label>
+              <label>
+                Invite code (only if you were given one)
+                <input
+                  type="text"
+                  autoComplete="off"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
                 />
               </label>
               <p className="muted small">

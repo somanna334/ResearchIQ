@@ -11,8 +11,12 @@ import LoginView from "./components/LoginView";
 import { clearToken, getToken, setUnauthorizedHandler } from "./session";
 import "./App.css";
 import "./Analysis.css";
+import "./Indexing.css";
 
 type View = "chat" | "analyze" | "eval";
+
+// How often the document list is refreshed while something is being indexed.
+const POLL_MS = 2000;
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -69,6 +73,15 @@ export default function App() {
   useEffect(() => {
     if (user) void refresh();
   }, [user, refresh]);
+
+  // While any document is still being indexed in the background, keep asking the
+  // server. The timer stops by itself once nothing is "processing" any more.
+  const anyProcessing = documents.some((d) => d.status === "processing");
+  useEffect(() => {
+    if (!user || !anyProcessing) return;
+    const timer = window.setInterval(() => void refresh(), POLL_MS);
+    return () => window.clearInterval(timer);
+  }, [user, anyProcessing, refresh]);
 
   async function signOut() {
     try {
