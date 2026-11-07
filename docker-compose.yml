@@ -1,4 +1,4 @@
-﻿services:
+services:
   db:
     image: pgvector/pgvector:pg17
     container_name: researchiq-db
@@ -7,14 +7,64 @@
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-researchiq_dev}
       POSTGRES_DB: researchiq
     ports:
-      - "127.0.0.1:5432:5432"   # reachable from this machine only
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U researchiq -d researchiq"]
       interval: 5s
       timeout: 3s
-      retries: 10
+      retries: 15
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    image: researchiq-backend:latest
+    container_name: researchiq-backend
+    environment:
+      RESEARCHIQ_ENVIRONMENT: development
+      RESEARCHIQ_CORS_ORIGINS: http://localhost:8080
+      RESEARCHIQ_DATA_DIR: /app/data
+      RESEARCHIQ_DATABASE_URL: postgresql+psycopg://researchiq:${POSTGRES_PASSWORD:-researchiq_dev}@db:5432/researchiq
+      RESEARCHIQ_BACKGROUND_INDEXING: "true"
+      RESEARCHIQ_INDEX_CONCURRENCY: "1"
+      RESEARCHIQ_GEMINI_API_KEY: ${RESEARCHIQ_GEMINI_API_KEY:-}
+      RESEARCHIQ_LOG_LEVEL: INFO
+      RESEARCHIQ_LOG_FORMAT: json
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - researchiq_data:/app/data
+      - researchiq_eval_results:/app/eval/results
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+    image: researchiq-frontend:latest
+    container_name: researchiq-frontend
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   pgdata:
+  researchiq_data:
+  researchiq_eval_results:

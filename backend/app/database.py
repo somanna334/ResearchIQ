@@ -1,7 +1,10 @@
 from collections.abc import Iterator
 from functools import lru_cache
+from pathlib import Path
 
-from sqlalchemy import Engine, create_engine, inspect, text
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import Engine, create_engine, inspect
 from sqlalchemy.orm import DeclarativeBase, Session
 
 from app.config import get_settings
@@ -23,46 +26,42 @@ def get_engine() -> Engine:
     return create_engine(settings.database_url, pool_pre_ping=True)
 
 
-def ensure_owner_column(engine: Engine) -> None:
-    """Add documents.owner_id to a database created before accounts existed."""
-    columns = {column["name"] for column in inspect(engine).get_columns("documents")}
-    if "owner_id" in columns:
-        return
-    with engine.begin() as conn:
-        conn.execute(
-            text(
-                "ALTER TABLE documents ADD COLUMN owner_id VARCHAR(36) "
-                "REFERENCES users (id) ON DELETE CASCADE"
-            )
-        )
-        conn.execute(
-            text("CREATE INDEX IF NOT EXISTS ix_documents_owner_id ON documents (owner_id)")
-        )
-
-
-def init_schema(engine: Engine) -> None:
-    """Create tables (and, on PostgreSQL, the vector extension and HNSW index)."""
-    from app import models  # noqa: F401  (registers the models on Base)
-
-    postgres = engine.dialect.name == "postgresql"
-    if postgres:
-        with engine.begin() as conn:
-            conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-    Base.metadata.create_all(engine)
-    ensure_owner_column(engine)
-    if postgres:
-        with engine.begin() as conn:
-            conn.execute(
-                text(
-                    "CREATE INDEX IF NOT EXISTS ix_embeddings_vector_hnsw "
-                    "ON embeddings USING hnsw (vector vector_cosine_ops)"
-                )
-            )
+def _alembic_config() -> Config:
+    """Load the backend's Alembic configuration independent of the CWD."""
+    backend_dir = Path(__file__).resolve().parent.parent
+    config = Config(str(backend_dir / "alembic.ini"))
+    # env.py obtains the effective URL from pydantic-settings.
+    return config
 
 
 def init_db() -> None:
-    """Called at startup (a migration tool replaces this in Milestone 10)."""
-    init_schema(get_engine())
+    """Apply versioned migrations, adopting a complete pre-Alembic schema safely."""
+    engine = get_engine()
+    inspector = inspect(engine)
+    tables = set(inspector.get_table_names())
+    app_tables = {"users", "auth_sessions", "documents", "pages", "chunks", "embeddings"}
+
+    config = _alembic_config()
+    if "alembic_version" not in tables:
+        existing_app_tables = tables & app_tables
+        if existing_app_tables:
+            # Milestone 9 databases were created with metadata.create_all. Stamp only
+            # when the complete current schema is present; never silently bless a
+            # partially upgraded or legacy schema. This does not alter user data.
+            complete = app_tables.issubset(tables)
+            has_owner = complete and "owner_id" in {
+                column["name"] for column in inspector.get_columns("documents")
+            }
+            if not (complete and has_owner):
+                missing = sorted(app_tables - tables)
+                raise RuntimeError(
+                    "Existing ResearchIQ database has a partial/legacy schema and "
+                    "cannot be auto-stamped. Back it up and migrate it deliberately. "
+                    f"Missing tables: {missing}; documents.owner_id present: {has_owner}."
+                )
+            command.stamp(config, "head")
+
+    command.upgrade(config, "head")
 
 
 def get_db() -> Iterator[Session]:
