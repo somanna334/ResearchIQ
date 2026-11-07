@@ -24,3 +24,5 @@ data/
 backend/eval/results/*-answers.json
 backend/eval/results/*.partial.jsonl
 backend/eval/results/*-audit.md
+bundle_m10.txt
+researchiq_backup.sql
